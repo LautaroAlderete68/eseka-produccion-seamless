@@ -318,98 +318,76 @@ export default function ProgramadaTable({
         return bFalta - aFalta;
       },
     },
-    room === 'SEAMLESS'
-      ? {
-          id: 'faltaUnidades',
-          label: 'Falta (un)',
-          align: 'right',
-          pdfRender: (row) => localizedNum(row.Target - row.Producido),
-          sortFn: (a, b, order) => {
-            const faltaCalc = (row, order) => {
-              const faltaUn = row.Target - row.Producido;
-              // send to bottom if falta is negative
-              if (faltaUn <= 0) {
-                return order === 'asc' ? Infinity : 0;
-              }
-              return faltaUn;
-            };
+    {
+      id: 'faltaUnidades',
+      label: 'Falta (un)',
+      align: 'right',
+      pdfRender: (row) => localizedNum(row.Target - row.Producido),
+      sortFn: (a, b, order) => {
+        const faltaCalc = (row, order) => {
+          const faltaUn = row.Target - row.Producido;
+          // send to bottom if falta is negative
+          if (faltaUn <= 0) {
+            return order === 'asc' ? Infinity : 0;
+          }
+          return faltaUn;
+        };
 
-            const aFaltaUn = faltaCalc(a, order);
-            const bFaltaUn = faltaCalc(b, order);
-            return bFaltaUn - aFaltaUn;
-          },
+        const aFaltaUn = faltaCalc(a, order);
+        const bFaltaUn = faltaCalc(b, order);
+        return bFaltaUn - aFaltaUn;
+      },
+    },
+    live && {
+      id: 'idealTime',
+      label: 'Tiempo Min.',
+      align: 'center',
+      width: 'w-[12%]',
+      pdfRender: (row) => {
+        if (!live) return '';
+
+        const idealTime = calcIdealTime(row);
+        switch (idealTime) {
+          case 0:
+            return '';
+          case -1:
+            return 'LLEGÓ';
+          default:
+            return getDuration(idealTime);
         }
-      : live
-      ? {
-          id: 'idealTime',
-          label: 'Tiempo Min.',
-          align: 'center',
-          width: 'w-[12%]',
-          pdfRender: (row) => {
-            if (!live) return '';
+      },
+      sortFn: (a, b, order) => {
+        if (!live) return 0;
 
-            const idealTime = calcIdealTime(row);
-            switch (idealTime) {
-              case 0:
-                return '';
-              case -1:
-                return 'LLEGÓ';
-              default:
-                return getDuration(idealTime);
-            }
-          },
-          sortFn: (a, b, order) => {
-            if (!live) return 0;
+        const aIdealTime = calcIdealTime(a);
+        const bIdealTime = calcIdealTime(b);
 
-            const aIdealTime = calcIdealTime(a);
-            const bIdealTime = calcIdealTime(b);
+        // articulos not in production to bottom always
+        // doing this first guarantees producing items remain at the
+        // beginning
+        if (!aIdealTime && a.Machines.length === 0)
+          return order === 'asc' ? -Infinity : Infinity;
+        if (!bIdealTime && b.Machines.length === 0)
+          return order === 'asc' ? Infinity : -Infinity;
 
-            // articulos not in production to bottom always
-            // doing this first guarantees producing items remain at the
-            // beginning
-            if (!aIdealTime && a.Machines.length === 0)
-              return order === 'asc' ? -Infinity : Infinity;
-            if (!bIdealTime && b.Machines.length === 0)
-              return order === 'asc' ? Infinity : -Infinity;
+        // if ideal time is 0 and is producing, place at top always
+        if (aIdealTime === 0 && a.Machines.length > 0)
+          return order === 'asc' ? 1 : -1;
+        if (bIdealTime === 0 && b.Machines.length > 0)
+          return order === 'asc' ? -1 : 1;
 
-            // if ideal time is 0 and is producing, place at top always
-            if (aIdealTime === 0 && a.Machines.length > 0)
-              return order === 'asc' ? 1 : -1;
-            if (bIdealTime === 0 && b.Machines.length > 0)
-              return order === 'asc' ? -1 : 1;
+        // always place LLEGÓ at the top when asc
+        // place at bottom when descending
+        if (aIdealTime === -1) return order === 'asc' ? 1 : 1;
+        if (bIdealTime === -1) return order === 'asc' ? -1 : -1;
 
-            // always place LLEGÓ at the top when asc
-            // place at bottom when descending
-            if (aIdealTime === -1) return order === 'asc' ? 1 : 1;
-            if (bIdealTime === -1) return order === 'asc' ? -1 : -1;
+        // if not LLEGÓ, sort by ideal time duration
+        let aDuration = getDurationUnix(aIdealTime);
+        let bDuration = getDurationUnix(bIdealTime);
 
-            // if not LLEGÓ, sort by ideal time duration
-            let aDuration = getDurationUnix(aIdealTime);
-            let bDuration = getDurationUnix(bIdealTime);
-
-            return bDuration - aDuration;
-          },
-        }
-      : {
-          id: 'faltaUnidades',
-          label: 'Falta (un)',
-          align: 'right',
-          pdfRender: (row) => localizedNum(row.Target - row.Producido),
-          sortFn: (a, b, order) => {
-            const faltaCalc = (row, order) => {
-              const faltaUn = row.Target - row.Producido;
-              // send to bottom if falta is negative
-              if (faltaUn <= 0) {
-                return order === 'asc' ? Infinity : 0;
-              }
-              return faltaUn;
-            };
-
-            const aFaltaUn = faltaCalc(a, order);
-            const bFaltaUn = faltaCalc(b, order);
-            return bFaltaUn - aFaltaUn;
-          },
-        },
+        return bDuration - aDuration;
+      },
+    },
     (live || room === 'SEAMLESS') && {
       id: 'target',
       label: 'Target (un)',
@@ -612,20 +590,20 @@ export default function ProgramadaTable({
           {/* Falta */}
           <td className='text-right'>{faltaStr(row, docena, porcExtra)}</td>
           {/* Falta (un.) */}
-          {room === 'SEAMLESS' ? (
-            <td className='text-right'>{localizedNum(faltaUnidades)}</td>
-          ) : live ? (
+          <td className='text-right'>{localizedNum(faltaUnidades)}</td>
+          {/* Tiempo Min. */}
+          {live && (
             <td className='text-center'>
               {calcIdealTime(row) === -1 ? (
                 'Llegó'
+              ) : calcIdealTime(row) === 0 ? (
+                ''
               ) : (
                 getDuration(calcIdealTime(row))
               )}
             </td>
-          ) : (
-            <td className='text-right'>{localizedNum(faltaUnidades)}</td>
           )}
-          {/* Target (un.) or Tiempo al 100% */}
+          {/* Target (un.) */}
           {(live || room === 'SEAMLESS') && (
             <td className='text-right'>
               <TargetCol row={row} faltaUnidades={faltaUnidades} />
@@ -736,26 +714,23 @@ export default function ProgramadaTable({
         storageKey={`${location.pathname}-${room}`}
         footer={[
           'Total',
-          footerFormat(totalAProducir), // Total A Producir
-          footerFormat(totalProducido), // Total Producido
-          footerFormat(totalFalta), // Total Falta
-          !live ? (
-            room === 'HOMBRE' ? (
-              <ProgLegend live={live} />
-            ) : (
-              true
-            )
-          ) : (
-            true
-          ),
-          !live && room === 'SEAMLESS' ? (
+          footerFormat(totalAProducir),
+          footerFormat(totalProducido),
+          footerFormat(totalFalta),
+          !live && room === 'HOMBRE' ? (
             <ProgLegend live={live} />
-          ) : !live && room === 'HOMBRE' ? (
-            false
           ) : (
             true
           ),
-          live && <ProgLegend live={live} />,
+          live ? true : false,
+          live ? (
+            true
+          ) : room === 'SEAMLESS' ? (
+            <ProgLegend live={live} />
+          ) : (
+            false
+          ),
+          live ? <ProgLegend live={live} /> : false,
         ]}
         headerTop='top-[94px]'
         stripe=''
