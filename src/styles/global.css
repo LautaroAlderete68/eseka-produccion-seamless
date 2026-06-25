@@ -83,21 +83,64 @@
 }
 
 [data-joy-color-scheme="dark"], .dark {
-  /* Dark mode colors - GitHub desaturated professional style */
+  /* Core backgrounds (Default Dark Antigravity cosmic slate style) */
+  --joy-palette-background-body: #090d16; /* Deep cosmic space */
+  --joy-palette-background-surface: #111827; /* Rich dark slate surface */
+  --joy-palette-background-popup: #111827; /* Popups and dropdown menus */
+  --joy-palette-background-input: #090d16; /* Inputs background */
+  --joy-palette-divider: #1f2937; /* Clean borders */
+
+  /* Primary color theme (Indigo accent) */
+  --joy-palette-primary-500: #6366f1; /* Indigo */
+  --joy-palette-primary-600: #4f46e5;
+  --joy-palette-primary-700: #4338ca;
+
+  /* Primary Soft variants (RefreshBtn background/text) */
+  --joy-palette-primary-softBg: #1e1b4b; /* Indigo deep bg */
+  --joy-palette-primary-softColor: #c7d2fe; /* Soft indigo text */
+  --joy-palette-primary-softHoverBg: #312e81; /* Hover state */
+  --joy-palette-primary-softActiveBg: #3730a3;
+
+  /* Primary Solid variants (Active switch / checked states) */
+  --joy-palette-primary-solidBg: #4f46e5;
+  --joy-palette-primary-solidHoverBg: #6366f1;
+  --joy-palette-primary-solidColor: #ffffff;
+
+  /* Neutral Soft variants (Default soft buttons/badges) */
+  --joy-palette-neutral-softBg: #1f2937;
+  --joy-palette-neutral-softColor: #e5e7eb;
+  --joy-palette-neutral-softHoverBg: #374151;
+
+  /* Neutral Outlined variants (Outlined buttons like Leyenda, Selects, Inputs) */
+  --joy-palette-neutral-outlinedBg: #111827;
+  --joy-palette-neutral-outlinedBorder: #1f2937;
+  --joy-palette-neutral-outlinedColor: #e5e7eb;
+  --joy-palette-neutral-outlinedHoverBg: #1f2937;
+  --joy-palette-neutral-outlinedHoverBorder: #4b5563;
+
+  /* Text colors */
+  --joy-palette-text-primary: #f9fafb; /* Off-white */
+  --joy-palette-text-secondary: #9ca3af; /* Soft desaturated gray */
+  --joy-palette-text-tertiary: #6b7280;
+
+  /* Focus ring */
+  --joy-palette-focusVisible: #6366f1;
+
+  /* State colors desaturated and professional for dark mode */
   --done-bg: #49181b; /* Soft dark red for complete */
   --almost-done-bg: #37161b; /* Soft dark rose for almost done */
   --todo-bg: #132f1d; /* Soft dark green for todo */
   --making-bg: #0d2744; /* Soft dark blue for making */
   --incomplete-bg: #21262d; /* Soft dark gray for incomplete */
-  --dark-accent-border: #30363d; /* GitHub border gray */
-  --row-hover-bg: #1f242c; /* Dark desaturated gray for row hover */
+  --dark-accent-border: #1f2937; /* Table divider matching slate border */
+  --row-hover-bg: #1b2330; /* Soft dark indigo hover */
 
   --todo-bg-pulse: #1a3f27;
   --making-bg-pulse: #133860;
   --done-bg-pulse: #612024;
   --almost-done-bg-pulse: #4d1f26;
   --incomplete-bg-pulse: #30363d;
-  --default-bg-pulse: #282e38;
+  --default-bg-pulse: #1c232f;
 
   --stop-general-bg: #52292f;
   --stop-target-bg: #3f1e63;
@@ -108,18 +151,52 @@
   --stop-turbina-bg: #194a4c;
 
   /* Neon highlight for status icons in dark mode */
-  --icon-color-success: #00ff87; /* Neon green */
-  --icon-color-danger: #ff3366; /* Neon pink/red */
-  --icon-color-warning: #ffcc00; /* Neon warning yellow */
+  --icon-color-success: #34d399; /* Emerald 400 */
+  --icon-color-danger: #f87171; /* Red 400 */
+  --icon-color-warning: #fbbf24; /* Amber 400 */
 
   /* Produccion Maquinas view variables (Dark) */
-  --prod-day-has-pieces: #1f2d3d;
-  --prod-day-no-pieces: #242526;
-  --prod-turno-has-pieces: #161b22;
-  --prod-turno-no-pieces: #21262d;
-  --prod-maquina-bg: #113622;
-  --prod-text-color: #c9d1d9;
-  --prod-text-muted: #8b949e;
+  --prod-day-has-pieces: #1e293b;
+  --prod-day-no-pieces: #0f172a;
+  --prod-turno-has-pieces: #090d16;
+  --prod-turno-no-pieces: #1e293b;
+  --prod-maquina-bg: #064e3b;
+  --prod-text-color: #f9fafb;
+  --prod-text-muted: #9ca3af;
+
+  /* Autocomplete, Select, Input elements in dark mode overrides */
+  .JoyInput-root, .JoySelect-root, .JoyAutocomplete-root, .JoyTextarea-root {
+    background-color: #090d16 !important;
+    border-color: #1f2937 !important;
+    color: #f9fafb !important;
+  }
+  .JoyInput-root:hover, .JoySelect-root:hover, .JoyAutocomplete-root:hover, .JoyTextarea-root:hover {
+    border-color: #374151 !important;
+  }
+  .JoyInput-root:focus-within, .JoySelect-root:focus-within, .JoyAutocomplete-root:focus-within, .JoyTextarea-root:focus-within {
+    border-color: #6366f1 !important;
+    box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.2) !important;
+  }
+
+  /* Switch custom overrides in dark mode */
+  .JoySwitch-root {
+    --Switch-trackBackground: #1f2937 !important;
+    --Switch-thumbBackground: #9ca3af !important;
+  }
+  .JoySwitch-root.Mui-checked {
+    --Switch-trackBackground: #6366f1 !important;
+    --Switch-thumbBackground: #ffffff !important;
+  }
+
+  /* Dropdown Menu overrides */
+  .JoyMenu-root {
+    background-color: #111827 !important;
+    border-color: #1f2937 !important;
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.5), 0 4px 6px -4px rgba(0, 0, 0, 0.5) !important;
+  }
+  .JoyMenuItem-root:hover {
+    background-color: #1f2937 !important;
+  }
 
   /* Chart Tooltip overrides for Dark Mode */
   .MuiChartsTooltip-paper,
