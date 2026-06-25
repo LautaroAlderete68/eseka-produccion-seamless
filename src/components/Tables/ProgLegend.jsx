@@ -98,13 +98,7 @@ export default function ProgLegend({ live }) {
                   <ErrorOutline fontSize='small' sx={{ color: 'var(--icon-color-danger)' }} />
                 </Stack>
               </ListItemDecorator>{' '}
-              Llegó. Parar máq.
-            </ListItem>
-            <ListItem>
-              <ListItemDecorator>
-                <Recommend fontSize='small' sx={{ color: 'white' }} />
-              </ListItemDecorator>{' '}
-              Llegó
+              {'\u00A0'}Llegó. Parar máq.
             </ListItem>
             <ListItem>
               <ListItemDecorator>
