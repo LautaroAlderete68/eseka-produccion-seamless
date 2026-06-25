@@ -54,8 +54,9 @@ function matchStyleAlert(alertStyle, rowArticulo) {
   if (alertBase !== rowBase) return false;
 
   if (rowDecimal !== '') {
-    const lastChar = cleanAlert.substring(cleanAlert.length - 1);
-    return rowDecimal === lastChar;
+    const alertSuffix = cleanAlert.match(/\d+$/)?.[0] || '';
+    if (alertSuffix === '') return false;
+    return parseInt(rowDecimal, 10) === parseInt(alertSuffix, 10);
   }
 
   return true;
