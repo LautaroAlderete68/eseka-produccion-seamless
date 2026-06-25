@@ -202,7 +202,12 @@ export default function ProgramadaTable({
 
   const currentRoomAlertsCount = useMemo(() => {
     return activeGroupAlerts.filter(alertStyle => 
-      progColor.some(row => matchStyleAlert(alertStyle, row.Articulo))
+      progColor.some(row => 
+        matchStyleAlert(alertStyle, row.Articulo) && 
+        (row.Docenas || row.Docenas === 0) && 
+        row.Machines.length > 0 && 
+        calcFaltaUnidades(row) > 0
+      )
     ).length;
   }, [activeGroupAlerts, progColor]);
 
@@ -475,7 +480,7 @@ export default function ProgramadaTable({
   function renderRow(row, i, opened, handleClick) {
     const faltaUnidades = calcFaltaUnidades(row);
 
-    const isTejiendo = row.Machines.length > 0;
+    const isTejiendo = (row.Docenas || row.Docenas === 0) && row.Machines.length > 0;
     const isGroupAlertActive = isTejiendo && faltaUnidades > 0 && activeGroupAlerts.some(alertStyle => matchStyleAlert(alertStyle, row.Articulo));
 
     let machinesList;
