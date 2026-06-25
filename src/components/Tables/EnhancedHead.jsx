@@ -1,7 +1,7 @@
 import Box from '@mui/joy/Box';
 import Checkbox from '@mui/joy/Checkbox';
 import Link from '@mui/joy/Link';
-import ArrowDownwardRounded from '@mui/icons-material/ArrowDownwardRounded';
+import ArrowDownwardOutlined from '@mui/icons-material/ArrowDownwardOutlined';
 import { visuallyHidden } from '@mui/utils';
 
 /**
@@ -82,7 +82,7 @@ export default function EnhancedHead({
                 onClick={order && orderBy && createSortHandler(col.id)}
                 startDecorator={
                   col.align && (
-                    <ArrowDownwardRounded
+                    <ArrowDownwardOutlined
                       fontSize='small'
                       sx={[active ? { opacity: 1 } : { opacity: 0 }]}
                     />
@@ -90,7 +90,7 @@ export default function EnhancedHead({
                 }
                 endDecorator={
                   !col.align && (
-                    <ArrowDownwardRounded
+                    <ArrowDownwardOutlined
                       fontSize='small'
                       sx={[active ? { opacity: 1 } : { opacity: 0 }]}
                     />

@@ -121,7 +121,7 @@ export default function Cambios() {
           <Typography
             className='relative justify-center w-full'
             startDecorator={
-              <ExpandRowBtn isOpen={opened} handleClick={handleClick} />
+              <ExpandRowBtn isOpen={opened === `${row.Shift}-${row.MachCode}`} handleClick={handleClick} />
             }
             sx={{
               '.MuiTypography-startDecorator': {
@@ -151,7 +151,7 @@ export default function Cambios() {
           className='font-semibold border-x'
           style={{
             backgroundColor: row.Hex,
-            color: row.WhiteText ? 'white' : 'black',
+            color: row.Hex ? (row.WhiteText ? 'white' : 'black') : 'inherit',
           }}
         >
           {row.Color}

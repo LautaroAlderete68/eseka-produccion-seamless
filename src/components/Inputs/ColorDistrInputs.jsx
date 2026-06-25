@@ -10,14 +10,17 @@ import { useContext, useEffect, useState } from 'react';
 import ColorSelect from './ColorSelect.jsx';
 import { useConfig } from '../../ConfigContext.jsx';
 import ErrorOutline from '@mui/icons-material/ErrorOutline';
+import Warning from '@mui/icons-material/Warning';
 import { ErrorContext } from '../../Contexts.js';
 import { useOutletContext } from 'react-router';
 
 let apiUrl;
 
-export default function ColorDistrInputs({ formData, setFormData }) {
+export default function ColorDistrInputs({ formData, setFormData, articulo }) {
   apiUrl = useConfig().apiUrl;
-  const { docena } = useOutletContext();
+  const outletCtx = useOutletContext() || {};
+  const docena = outletCtx.docena || 12;
+  const room = outletCtx.room || '';
   const error = useContext(ErrorContext);
   const [colors, setColors] = useState([]);
   const [switched, setSwitched] = useState(
@@ -41,6 +44,88 @@ export default function ColorDistrInputs({ formData, setFormData }) {
       ignore = true;
     };
   }, []);
+
+  const [specialArticles, setSpecialArticles] = useState(['2398', '2621', '2622', '3352', '3356', '3668', '3354']);
+
+  useEffect(() => {
+    let ignore = false;
+    fetch(`${apiUrl}/articulos-especiales`)
+      .then((res) => res.json())
+      .then((data) => {
+        if (!ignore && Array.isArray(data)) {
+          setSpecialArticles(data.map(String));
+        }
+      })
+      .catch((err) => console.error('[CLIENT] Error fetching special articles:', err));
+    return () => {
+      ignore = true;
+    };
+  }, []);
+
+  const getAutomaticColor = (art, rm) => {
+    if (rm !== 'HOMBRE' || !art) return null;
+    const strArt = String(art).trim();
+    const parts = strArt.split('.');
+    if (parts.length < 2) return null;
+    const baseArt = parts[0].trim();
+    const dec = parts[1].trim();
+    const isSpecial = specialArticles.includes(baseArt);
+    let designNum = null;
+    if (isSpecial) {
+      if (dec === '01') {
+        designNum = 1;
+      } else if (dec === '1') {
+        designNum = 10;
+      } else {
+        const parsed = parseInt(dec, 10);
+        if (!isNaN(parsed)) designNum = parsed;
+      }
+    } else {
+      const parsed = parseInt(dec, 10);
+      if (!isNaN(parsed)) designNum = parsed;
+    }
+    if (designNum !== null) return `DISEÑO ${designNum}`;
+    return null;
+  };
+
+  const isMoreThan10Variants = (art) => {
+    if (!art) return false;
+    const base = String(art).trim().split('.')[0].trim();
+    return specialArticles.includes(base);
+  };
+
+  useEffect(() => {
+    if (colors.length === 0 || !articulo) return;
+    const autoColorName = getAutomaticColor(articulo, room);
+    if (!autoColorName) return;
+    const matchedColor = colors.find(
+      (c) => String(c.Color).toUpperCase().trim() === autoColorName.toUpperCase().trim()
+    );
+    if (!matchedColor) return;
+
+    if (!switched) {
+      const currentVal = formData.colorDistr?.[0]?.color;
+      if (currentVal === undefined || currentVal === null) {
+        setFormData((prev) => ({
+          ...prev,
+          colorDistr: [{ color: matchedColor.Id, porcentaje: 1 }],
+        }));
+      }
+    } else {
+      const currentVal = formData.colorDistr?.[0]?.color;
+      if (currentVal === undefined || currentVal === null) {
+        setFormData((prev) => {
+          const colorDistr = [...(prev.colorDistr || [])];
+          if (colorDistr.length === 0) {
+            colorDistr.push({ color: matchedColor.Id, porcentaje: 1 });
+          } else {
+            colorDistr[0] = { ...colorDistr[0], color: matchedColor.Id };
+          }
+          return { ...prev, colorDistr };
+        });
+      }
+    }
+  }, [colors, articulo, switched, room]);
 
   return (
     <Stack direction='column' className='gap-4'>
@@ -104,13 +189,31 @@ export default function ColorDistrInputs({ formData, setFormData }) {
           inheritedColors={colors}
           required
           allowAdd
+          warning={
+            isMoreThan10Variants(articulo)
+              ? 'Advertencia, artículo con más de 10 variantes.'
+              : null
+          }
         />
       ) : (
         <FormControl error={error} required>
-          <Stack direction='row' className='items-center justify-between'>
-            <FormLabel color={error === 'color' ? 'danger' : ''}>
-              Colores
-            </FormLabel>
+          <Stack direction='row' className='items-center justify-between' sx={{ mb: 1 }}>
+            <Stack direction="row" spacing={1} alignItems="center">
+              <FormLabel color={error === 'color' ? 'danger' : ''} sx={{ mb: 0 }}>
+                Colores
+              </FormLabel>
+              {isMoreThan10Variants(articulo) && (
+                <Typography
+                  level="body-xs"
+                  color="warning"
+                  variant="soft"
+                  startDecorator={<Warning sx={{ fontSize: '1rem' }} />}
+                  sx={{ px: 1, py: 0.25, borderRadius: 'xs' }}
+                >
+                  Advertencia, artículo con más de 10 variantes.
+                </Typography>
+              )}
+            </Stack>
             <FormLabel color={error === 'distr' ? 'danger' : ''}>
               Distribución
             </FormLabel>

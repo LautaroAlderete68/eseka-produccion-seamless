@@ -21,4 +21,10 @@ module.exports = {
   dailyWEff: require('./dailyWEffTestData.js'),
   monthSaldo: require('./monthSaldoTestData.js'),
   cambios: require('./cambiosTestData.js'),
+  offline: require('./offlineTestData.js'),
+  grupos: require('./gruposTestData.js'),
+  distribucion: require('./distribucionTestData.js'),
+  produccionMaquinas: require('./produccionMaquinasTestData.js'),
 };
+
+

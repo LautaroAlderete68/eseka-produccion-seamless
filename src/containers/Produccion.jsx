@@ -27,21 +27,22 @@ export default function Produccion() {
     colorId: '',
   });
 
-  // get all on load
+  // Sync room into formData when room changes
   useEffect(() => {
-    let ignore = false;
+    setFormData((prev) => ({ ...prev, room }));
+  }, [room]);
+
+  // Keep url in sync with room and formData
+  useEffect(() => {
     const params = new URLSearchParams({
       ...formData,
+      room,
       startDate: formData.startDate.format(sqlDateFormat),
       endDate: formData.endDate.format(sqlDateFormat),
     }).toString();
 
-    if (!ignore) setUrl(`${apiUrl}/produccion?${params}`);
-
-    return () => {
-      ignore = true;
-    };
-  }, []);
+    setUrl(`${apiUrl}/produccion?${params}`);
+  }, [room, formData.startDate, formData.endDate, formData.actual, formData.articulo, formData.talle, formData.colorId, apiUrl, sqlDateFormat]);
 
   useEffect(() => {
     let ignore = false;
@@ -159,7 +160,7 @@ export default function Produccion() {
           className='font-semibold border-x'
           style={{
             backgroundColor: row.Hex,
-            color: row.WhiteText ? 'white' : 'black',
+            color: row.Hex ? (row.WhiteText ? 'white' : 'black') : 'inherit',
           }}
         >
           {row.Color}

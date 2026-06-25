@@ -1,5 +1,5 @@
-import KeyboardArrowDownRounded from '@mui/icons-material/KeyboardArrowDownRounded';
-import RestartAltRounded from '@mui/icons-material/RestartAltRounded';
+import KeyboardArrowDownOutlined from '@mui/icons-material/KeyboardArrowDownOutlined';
+import RestartAltOutlined from '@mui/icons-material/RestartAltOutlined';
 import Card from '@mui/joy/Card';
 import IconButton from '@mui/joy/IconButton';
 import List from '@mui/joy/List';
@@ -31,7 +31,7 @@ export default function CompareInstructions() {
               color='neutral'
               onClick={() => setOpenInstr(!openInstr)}
             >
-              <KeyboardArrowDownRounded
+              <KeyboardArrowDownOutlined
                 sx={{
                   transition: '0.2s',
                   // Rotate icon depending on sort order
@@ -77,7 +77,7 @@ export default function CompareInstructions() {
               <Typography>
                 Para cargar programada nueva del mes, oprima{' '}
                 <Typography variant='solid' color='danger'>
-                  <RestartAltRounded className='pb-1' />
+                  <RestartAltOutlined className='pb-1' />
                 </Typography>{' '}
                 para resetear y luego{' '}
                 <Typography

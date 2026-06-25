@@ -17,6 +17,12 @@ export default function DailyEff({ setYesterdayEff }) {
   const [loading, setLoading] = useState(true);
   const [dataset, setDataset] = useState([]);
   const { monthStart, yesterday } = getIntervalDates();
+  const [prevRoom, setPrevRoom] = useState(room);
+  if (room !== prevRoom) {
+    setPrevRoom(room);
+    setLoading(true);
+    setDataset([]);
+  }
 
   useEffect(() => {
     let ignored = false;
@@ -41,7 +47,7 @@ export default function DailyEff({ setYesterdayEff }) {
     return () => {
       ignored = true;
     };
-  }, []);
+  }, [apiUrl, room, setYesterdayEff]);
 
   const avgEff = useMemo(() => {
     if (dataset.length === 0) return 0;

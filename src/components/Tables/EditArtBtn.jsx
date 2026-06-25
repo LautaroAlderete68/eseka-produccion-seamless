@@ -1,4 +1,4 @@
-import Edit from '@mui/icons-material/Edit';
+import EditOutlined from '@mui/icons-material/EditOutlined';
 import { useState } from 'react';
 import EditArticuloForm from '../Forms/EditArticuloForm.jsx';
 import ModalWrapper from '../ModalWrapper.jsx';
@@ -35,7 +35,7 @@ export default function EditArtBtn({ articulo, tipo, talle }) {
 
   return (
     <>
-      <Edit
+      <EditOutlined
         size='small'
         onClick={handleClick}
         className='absolute top-0 left-[100%] invisible group-hover/color:visible'

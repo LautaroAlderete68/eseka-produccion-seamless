@@ -29,4 +29,19 @@ module.exports = {
   getDailyWEff: require('./getDailyWEff.js'),
   getMonthSaldo: require('./getMonthSaldo.js'),
   getCambios: require('./getCambios.js'),
+  getOfflineMachines: require('./getOfflineMachines.js'),
+  getGruposMachines: require('./getGruposMachines.js'),
+  getGruposTargets: require('./getGruposTargets.js'),
+  getDistribucionColores: require('./getDistribucionColores.js'),
+  getMachineProduction: require('./getMachineProduction.js'),
+  getMachineDefects: require('./getMachineDefects.js'),
+  getDisponiblesMachines: require('./getDisponiblesMachines.js'),
+  searchColorCodes: require('./searchColorCodes.js'),
+  getAppColores: require('./getAppColores.js'),
+  updateStyleCode: require('./updateStyleCode.js'),
+  getColorCodesLog: require('./getColorCodesLog.js'),
+  updateColor: require('./updateColor.js'),
+  getProgramadaHistory: require('./getProgramadaHistory.js'),
 };
+
+

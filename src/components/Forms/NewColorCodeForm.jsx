@@ -10,15 +10,16 @@ import Typography from '@mui/joy/Typography';
 import { useConfig } from '../../ConfigContext.jsx';
 import FloatingLabelInput from '../Inputs/FloatingLabelInput.jsx';
 import ColorSelect from '../Inputs/ColorSelect.jsx';
-import AddRounded from '@mui/icons-material/AddRounded';
-import DeleteRounded from '@mui/icons-material/DeleteRounded';
+import AddOutlined from '@mui/icons-material/AddOutlined';
+import DeleteOutlined from '@mui/icons-material/DeleteOutlined';
 import { ToastsContext } from '../../Contexts.js';
 import DialogActions from '@mui/joy/DialogActions';
 import DialogContent from '@mui/joy/DialogContent';
 import DialogTitle from '@mui/joy/DialogTitle';
 import Modal from '@mui/joy/Modal';
 import ModalDialog from '@mui/joy/ModalDialog';
-import WarningRounded from '@mui/icons-material/WarningRounded';
+import WarningOutlined from '@mui/icons-material/WarningOutlined';
+import Warning from '@mui/icons-material/Warning';
 import Divider from '@mui/joy/Divider';
 
 let apiUrl;
@@ -30,10 +31,10 @@ export default function NewColorCodeForm({ newColorCode, setNewColorCodes }) {
   const [formData, setFormData] = useState({});
   const [loading, setLoading] = useState(false);
   const [deleteOpen, setDeleteOpen] = useState(false);
+  const [specialArticles, setSpecialArticles] = useState(['2398', '2621', '2622', '3352', '3356', '3668', '3354']);
 
   useEffect(() => {
     let ignore = false;
-
     fetch(`${apiUrl}/colors`)
       .then((res) => res.json())
       .then((data) => {
@@ -41,10 +42,63 @@ export default function NewColorCodeForm({ newColorCode, setNewColorCodes }) {
       })
       .catch((err) => console.error('[CLIENT] Error fetching /colors:', err));
 
+    fetch(`${apiUrl}/articulos-especiales`)
+      .then((res) => res.json())
+      .then((data) => {
+        if (!ignore && Array.isArray(data)) {
+          setSpecialArticles(data.map(String));
+        }
+      })
+      .catch((err) => console.error('[CLIENT] Error fetching special articles:', err));
+
     return () => {
       ignore = true;
     };
   }, []);
+
+  useEffect(() => {
+    if (!newColorCode || colors.length === 0) return;
+
+    const artBase = String(newColorCode.StyleCode.articulo).split('.')[0].trim();
+    const isSpecial = specialArticles.includes(artBase);
+    const code = String(newColorCode.StyleCode.color || '').trim();
+
+    let autoPunto = '';
+    let autoColorId = null;
+
+    // Extrae cualquier número de dígitos ignorando el prefijo opcional 'D' o 'd'
+    const match = code.match(/^[Dd]?(\d+)$/);
+    if (match) {
+      const numVal = parseInt(match[1], 10);
+
+      if (isSpecial) {
+        // En los especiales: si es menor a 10 (ej: D1 -> 1, D2 -> 2), se le agrega un 0 adelante (01, 02)
+        if (numVal < 10) {
+          autoPunto = '0' + numVal;
+        } else {
+          autoPunto = String(numVal);
+        }
+      } else {
+        // En los comunes: D2 quiere decir .2
+        autoPunto = String(numVal);
+      }
+
+      const designName = `DISEÑO ${numVal}`;
+      const matchedColor = colors.find(
+        (c) => (c.Color || '').toUpperCase() === designName.toUpperCase()
+      );
+      if (matchedColor) {
+        autoColorId = matchedColor.Id;
+      }
+    }
+
+    setFormData({
+      punto: autoPunto,
+      tipo: '',
+      color: autoColorId,
+      code: code,
+    });
+  }, [newColorCode, colors, specialArticles]);
 
   async function handleSubmit(e) {
     e.preventDefault();
@@ -54,7 +108,7 @@ export default function NewColorCodeForm({ newColorCode, setNewColorCodes }) {
       ...formData,
       articulo: newColorCode.StyleCode.articulo,
       punto: formData.punto ?? newColorCode.StyleCode.punto,
-      tipo: formData.tipo ?? newColorCode.StyleCode.tipo,
+      tipo: null, // Dejar "Tipo" vacio siempre
       talle: newColorCode.StyleCode.talle,
       styleCode: newColorCode.StyleCode.styleCode,
     };
@@ -109,6 +163,18 @@ export default function NewColorCodeForm({ newColorCode, setNewColorCodes }) {
         className='w-xs'
       >
         <Stack direction='column' className='gap-4'>
+          {specialArticles.includes(String(newColorCode.StyleCode.articulo).split('.')[0].trim()) && (
+            <Typography
+              level="body-xs"
+              color="warning"
+              variant="soft"
+              startDecorator={<Warning sx={{ fontSize: '1rem' }} />}
+              sx={{ px: 1, py: 0.25, borderRadius: 'xs', width: 'fit-content' }}
+            >
+              Advertencia, artículo con más de 10 variantes.
+            </Typography>
+          )}
+
           <Stack direction='column' className='gap-1.5'>
             <Stack direction='row' className='items-start max-w-full gap-4'>
               <FormControl>
@@ -166,16 +232,9 @@ export default function NewColorCodeForm({ newColorCode, setNewColorCodes }) {
             <FormLabel>Tipo (si aplica)</FormLabel>
             <Stack direction='row' className='gap-2'>
               <Input
-                value={formData.tipo ?? newColorCode.StyleCode.tipo ?? ''}
-                onChange={(e) =>
-                  setFormData({
-                    ...formData,
-                    tipo: e.target.value,
-                  })
-                }
-                disabled={newColorCode.StyleCode.tipo}
+                value=''
+                disabled
                 type='text'
-                slotProps={{ input: { maxLength: 1, pattern: '[#$%]' } }}
                 className='w-10'
               />
               <FormHelperText className='mt-0'>
@@ -224,6 +283,7 @@ export default function NewColorCodeForm({ newColorCode, setNewColorCodes }) {
                   code: newColorCode.StyleCode.color,
                 }));
               }}
+              val={formData.color || null}
               inheritedColors={colors}
               required
               allowAdd
@@ -235,7 +295,7 @@ export default function NewColorCodeForm({ newColorCode, setNewColorCodes }) {
             <Button
               color='danger'
               variant='outlined'
-              startDecorator={<DeleteRounded />}
+              startDecorator={<DeleteOutlined />}
               sx={{ '& .MuiButton-startDecorator': { mr: '2px' } }}
               className='grow'
               onClick={() => setDeleteOpen(true)}
@@ -245,7 +305,7 @@ export default function NewColorCodeForm({ newColorCode, setNewColorCodes }) {
             <Button
               type='submit'
               loading={loading}
-              startDecorator={!loading && <AddRounded />}
+              startDecorator={!loading && <AddOutlined />}
               sx={{ '& .MuiButton-startDecorator': { mr: '2px' } }}
               className='grow'
             >
@@ -259,7 +319,7 @@ export default function NewColorCodeForm({ newColorCode, setNewColorCodes }) {
         <Modal open={deleteOpen} onClose={() => setDeleteOpen(false)}>
           <ModalDialog variant='outlined' role='alertdialog'>
             <DialogTitle>
-              <WarningRounded />
+              <WarningOutlined />
               Confirmar
             </DialogTitle>
 

@@ -229,7 +229,7 @@ export default function MaquinasTable({ machines, pdfRows }) {
           <Typography
             className='relative justify-center w-full'
             startDecorator={
-              <ExpandRowBtn isOpen={opened} handleClick={handleClick} />
+              <ExpandRowBtn isOpen={opened === row.MachCode} handleClick={handleClick} />
             }
             sx={{
               '.MuiTypography-startDecorator': {

@@ -1,9 +1,11 @@
-import CrisisAlertRounded from '@mui/icons-material/CrisisAlertRounded';
-import DownloadRounded from '@mui/icons-material/DownloadRounded';
-import FlagRounded from '@mui/icons-material/FlagRounded';
-import QuestionMarkRounded from '@mui/icons-material/QuestionMarkRounded';
-import SyncProblemRounded from '@mui/icons-material/SyncProblemRounded';
-import ReportRounded from '@mui/icons-material/ReportRounded';
+import CrisisAlertOutlined from '@mui/icons-material/CrisisAlertOutlined';
+import ArrowCircleDownOutlined from '@mui/icons-material/ArrowCircleDownOutlined';
+import FlagCircleOutlined from '@mui/icons-material/FlagCircleOutlined';
+import HelpOutline from '@mui/icons-material/HelpOutline';
+import SyncProblemOutlined from '@mui/icons-material/SyncProblemOutlined';
+import ErrorOutline from '@mui/icons-material/ErrorOutline';
+import Recommend from '@mui/icons-material/Recommend';
+import FrontHand from '@mui/icons-material/FrontHand';
 import Stack from '@mui/joy/Stack';
 import Typography from '@mui/joy/Typography';
 import { roundUpEven } from '../../utils/progTableUtils';
@@ -18,7 +20,13 @@ export default function TargetCol({ row, faltaUnidades }) {
     <Typography
       className='justify-end'
       endDecorator={icon}
-      sx={{ '& .MuiTypography-endDecorator': { m: 0 } }}
+      sx={{
+        '& .MuiTypography-endDecorator': {
+          m: 0,
+          ml: 0.5,
+          '& svg': { fontSize: '1.375rem' },
+        },
+      }}
     >
       {target}
     </Typography>
@@ -37,15 +45,15 @@ export default function TargetCol({ row, faltaUnidades }) {
         return (
           <TargetData
             target={localizedNum(row.Target)}
-            icon={<DownloadRounded fontSize={iconFontSize} />}
+            icon={<ArrowCircleDownOutlined fontSize={iconFontSize} sx={{ color: 'var(--icon-color-warning)' }} />}
           />
         );
-      } else if (machTarget > row.Target) {
+      } else if (machTarget - row.Target > 2) {
         // Reset counter
         return (
           <TargetData
             target={localizedNum(machTarget)}
-            icon={<SyncProblemRounded fontSize={iconFontSize} />}
+            icon={<SyncProblemOutlined fontSize={iconFontSize} sx={{ color: 'var(--icon-color-danger)' }} />}
           />
         );
       } else if (
@@ -57,7 +65,7 @@ export default function TargetCol({ row, faltaUnidades }) {
         return (
           <TargetData
             target={localizedNum(machTarget)}
-            icon={<QuestionMarkRounded fontSize={iconFontSize} />}
+            icon={<HelpOutline fontSize={iconFontSize} sx={{ color: 'var(--icon-color-warning)' }} />}
           />
         );
       } else if (
@@ -75,15 +83,20 @@ export default function TargetCol({ row, faltaUnidades }) {
                 </Typography>
               </Stack>
             }
-            icon={<CrisisAlertRounded fontSize={iconFontSize} />}
+            icon={<CrisisAlertOutlined fontSize={iconFontSize} sx={{ color: 'var(--icon-color-warning)' }} />}
           />
         );
       } else if (row.Machines[0].TargetOrder === 0 && faltaUnidades <= 0) {
-        // target met, stop machine
+        // target met, stop machine (Llegó. Parar máq.)
         return (
           <TargetData
-            target={'LLEGÓ'}
-            icon={<ReportRounded fontSize={iconFontSize} />}
+            target=""
+            icon={
+              <Stack direction="row" spacing={0.5} alignItems="center">
+                <FrontHand fontSize={iconFontSize} sx={{ color: 'var(--icon-color-danger)' }} />
+                <ErrorOutline fontSize={iconFontSize} sx={{ color: 'var(--icon-color-danger)' }} />
+              </Stack>
+            }
           />
         );
       } else if (row.Machines[0].TargetOrder === 0) {
@@ -91,13 +104,18 @@ export default function TargetCol({ row, faltaUnidades }) {
         return (
           <TargetData
             target={localizedNum(machTarget)}
-            icon={<FlagRounded fontSize={iconFontSize} />}
+            icon={<FlagCircleOutlined fontSize={iconFontSize} sx={{ color: 'var(--icon-color-success)' }} />}
           />
         );
       }
     } else if (faltaUnidades <= 0) {
-      // target met, not producing
-      return 'LLEGÓ';
+      // target met, not producing (Llegó)
+      return (
+        <TargetData
+          target=""
+          icon={<Recommend fontSize={iconFontSize} sx={{ color: 'white' }} />}
+        />
+      );
     }
 
     return localizedNum(machTarget);
@@ -117,9 +135,9 @@ export default function TargetCol({ row, faltaUnidades }) {
           target={`${m.MachCode} -> ${localizedNum(machineTarget)}`}
           icon={
             row.Producido === 0 ? (
-              <DownloadRounded fontSize='inherit' />
+              <ArrowCircleDownOutlined fontSize='inherit' sx={{ color: 'var(--icon-color-warning)' }} />
             ) : m.TargetOrder === 0 ? (
-              <QuestionMarkRounded fontSize='inherit' />
+              <HelpOutline fontSize='inherit' sx={{ color: 'var(--icon-color-warning)' }} />
             ) : null
           }
         />

@@ -5,6 +5,7 @@ import {
   DateTimePicker,
   PickersTextField,
 } from '@mui/x-date-pickers';
+import CalendarMonthOutlined from '@mui/icons-material/CalendarMonthOutlined';
 
 const JoyPickersTextField = styled(PickersTextField)({
   boxShadow: 'var(--joy-shadowRing)',
@@ -86,8 +87,99 @@ const JoyPickersCalendar = styled(Paper)({
   borderRadius: 'var(--joy-radius-sm)',
   border: '1px solid var(--joy-palette-neutral-outlinedBorder)',
   backgroundColor: 'var(--joy-palette-background-surface)',
+  color: 'var(--joy-palette-text-primary)',
   '& *': {
     fontFamily: 'var(--joy-fontFamily-body)!important',
+  },
+  // Week days header (L M M J V S D)
+  '& .MuiDayCalendar-weekDayLabel': {
+    color: 'var(--joy-palette-text-secondary)',
+  },
+  // Calendar header (Month, Year)
+  '& .MuiPickersCalendarHeader-label': {
+    color: 'var(--joy-palette-text-primary)',
+    fontWeight: 'var(--joy-fontWeight-md)',
+  },
+  // Navigation icons (left / right arrows)
+  '& .MuiIconButton-root': {
+    color: 'var(--joy-palette-text-primary)',
+    '&:hover': {
+      backgroundColor: 'var(--joy-palette-neutral-hoverBg)',
+    },
+    '&.Mui-disabled': {
+      color: 'var(--joy-palette-neutral-outlinedDisabledColor)',
+    },
+  },
+  // Calendar days
+  '& .MuiPickersDay-root': {
+    color: 'var(--joy-palette-text-primary)',
+    backgroundColor: 'transparent',
+    '&:hover': {
+      backgroundColor: 'var(--joy-palette-neutral-hoverBg)',
+    },
+    '&.Mui-selected': {
+      backgroundColor: 'var(--joy-palette-primary-solidBg) !important',
+      color: 'var(--joy-palette-primary-solidColor) !important',
+      '&:hover': {
+        backgroundColor: 'var(--joy-palette-primary-solidHoverBg) !important',
+      },
+    },
+    '&.MuiPickersDay-today': {
+      borderColor: 'var(--joy-palette-primary-outlinedBorder)',
+      color: 'var(--joy-palette-primary-plainColor)',
+      '&.Mui-selected': {
+        color: 'var(--joy-palette-primary-solidColor) !important',
+      },
+    },
+    '&.Mui-disabled': {
+      color: 'var(--joy-palette-neutral-outlinedDisabledColor)',
+    },
+  },
+  // Year selector
+  '& .MuiPickersYear-yearButton': {
+    color: 'var(--joy-palette-text-primary)',
+    backgroundColor: 'transparent',
+    '&:hover': {
+      backgroundColor: 'var(--joy-palette-neutral-hoverBg)',
+    },
+    '&.Mui-selected': {
+      backgroundColor: 'var(--joy-palette-primary-solidBg) !important',
+      color: 'var(--joy-palette-primary-solidColor) !important',
+      '&:hover': {
+        backgroundColor: 'var(--joy-palette-primary-solidHoverBg) !important',
+      },
+    },
+  },
+  // Digital Clock (Time Picker)
+  '& .MuiDigitalClock-list': {
+    backgroundColor: 'var(--joy-palette-background-surface)',
+  },
+  '& .MuiDigitalClock-item': {
+    color: 'var(--joy-palette-text-primary)',
+    backgroundColor: 'transparent',
+    '&:hover': {
+      backgroundColor: 'var(--joy-palette-neutral-hoverBg)',
+    },
+    '&.Mui-selected': {
+      backgroundColor: 'var(--joy-palette-primary-solidBg) !important',
+      color: 'var(--joy-palette-primary-solidColor) !important',
+    },
+  },
+  // Multi-section clock (if used)
+  '& .MuiMultiSectionDigitalClock-root': {
+    backgroundColor: 'var(--joy-palette-background-surface)',
+    borderTop: '1px solid var(--joy-palette-neutral-outlinedBorder)',
+  },
+  '& .MuiMultiSectionDigitalClockSection-item': {
+    color: 'var(--joy-palette-text-primary)',
+    backgroundColor: 'transparent',
+    '&:hover': {
+      backgroundColor: 'var(--joy-palette-neutral-hoverBg)',
+    },
+    '&.Mui-selected': {
+      backgroundColor: 'var(--joy-palette-primary-solidBg) !important',
+      color: 'var(--joy-palette-primary-solidColor) !important',
+    },
   },
 });
 
@@ -98,6 +190,7 @@ function StyledDatePicker({ ...props }) {
       slots={{
         textField: JoyPickersTextField,
         desktopPaper: JoyPickersCalendar,
+        openPickerIcon: CalendarMonthOutlined,
       }}
     />
   );
@@ -110,6 +203,7 @@ function StyledDateTimePicker({ ...props }) {
       slots={{
         textField: JoyPickersTextField,
         desktopPaper: JoyPickersCalendar,
+        openPickerIcon: CalendarMonthOutlined,
       }}
     />
   );

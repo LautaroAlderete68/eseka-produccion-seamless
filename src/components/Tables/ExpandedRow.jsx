@@ -8,8 +8,8 @@ import { useContext, useEffect, useMemo, useState } from 'react';
 import { useConfig } from '../../ConfigContext.jsx';
 import dayjs from 'dayjs';
 import { DatesContext } from '../../Contexts.js';
-import KeyboardArrowLeftRounded from '@mui/icons-material/KeyboardArrowLeftRounded';
-import KeyboardArrowRightRounded from '@mui/icons-material/KeyboardArrowRightRounded';
+import KeyboardArrowLeftOutlined from '@mui/icons-material/KeyboardArrowLeftOutlined';
+import KeyboardArrowRightOutlined from '@mui/icons-material/KeyboardArrowRightOutlined';
 import TableSkeleton from './TableSkeleton.jsx';
 import { useLocation } from 'react-router';
 import localizedNum from '../../utils/numFormat.js';
@@ -28,8 +28,8 @@ export default function ExpandedRow({ numCols, row }) {
 
   const searchBy = useMemo(
     () =>
-      pathname === '/maquinas' || pathname === '/cambios'
-        ? { machCode: row.MachCode }
+      pathname === '/maquinas' || pathname === '/cambios' || pathname === '/offline' || pathname === '/disponibles'
+        ? { machCode: row.MachCode || row['Máquina'] }
         : { articulo: row.Articulo, talle: row.Talle, color: row.ColorId },
     [pathname, row]
   );
@@ -128,7 +128,7 @@ export default function ExpandedRow({ numCols, row }) {
                         if (page > 1) setPage(page - 1);
                       }}
                     >
-                      <KeyboardArrowLeftRounded />
+                      <KeyboardArrowLeftOutlined />
                     </IconButton>
 
                     <IconButton
@@ -138,7 +138,7 @@ export default function ExpandedRow({ numCols, row }) {
                         if (pageEnd(page) < history.length) setPage(page + 1);
                       }}
                     >
-                      <KeyboardArrowRightRounded />
+                      <KeyboardArrowRightOutlined />
                     </IconButton>
                   </Stack>
                 </Stack>
@@ -167,11 +167,11 @@ export default function ExpandedRow({ numCols, row }) {
                 <th className='w-[20%]'>Fecha</th>
                 <th className='w-[5%]'>Turno</th>
                 <th className='w-[10%]'>Máquina</th>
-                <th className=''>StyleCode</th>
+                <th className=''>Cadena</th>
                 <th>Prendas</th>
-                <th>OrderPieces</th>
+                <th>Cuenta Prendas</th>
                 <th>Target</th>
-                <th>Discards</th>
+                <th>Descartes</th>
               </tr>
             </thead>
             <tbody>

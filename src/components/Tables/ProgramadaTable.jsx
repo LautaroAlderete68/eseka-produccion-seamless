@@ -1,4 +1,4 @@
-import { useEffect, useMemo } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useConfig } from '../../ConfigContext.jsx';
 import Typography from '@mui/joy/Typography';
 import TargetCol from './TargetCol.jsx';
@@ -19,12 +19,47 @@ import ArticuloCol from './ArticuloCol.jsx';
 import { DatesContext } from '../../Contexts.js';
 import ProgLegend from './ProgLegend.jsx';
 import EditArtBtn from './EditArtBtn.jsx';
-import { Link, useOutletContext } from 'react-router';
+import { Link, useOutletContext, useLocation } from 'react-router';
 import { getDuration, getDurationUnix } from '../../utils/maquinasUtils.js';
 import localizedNum from '../../utils/numFormat.js';
 import Stack from '@mui/joy/Stack';
+import Box from '@mui/joy/Box';
+import Button from '@mui/joy/Button';
+import IconButton from '@mui/joy/IconButton';
+import CheckCircleOutlined from '@mui/icons-material/CheckCircleOutlined';
+import Recommend from '@mui/icons-material/Recommend';
 
 let apiUrl;
+
+function matchStyleAlert(alertStyle, rowArticulo) {
+  if (!alertStyle || !rowArticulo) return false;
+  
+  const cleanAlert = String(alertStyle).trim().toUpperCase();
+  const cleanRow = String(rowArticulo).trim().toUpperCase().replace(',', '.');
+  
+  if (cleanAlert === cleanRow) return true;
+
+  const rowParts = cleanRow.split('.');
+  const rowBase = parseInt(rowParts[0], 10);
+  const rowDecimal = rowParts[1] || '';
+
+  const alertMatch = cleanAlert.match(/^\d+/);
+  if (!alertMatch) return false;
+  
+  const alertDigits = alertMatch[0];
+  const alertBase = alertDigits.length >= 5 
+    ? parseInt(alertDigits.substring(0, 5), 10) 
+    : parseInt(alertDigits, 10);
+
+  if (alertBase !== rowBase) return false;
+
+  if (rowDecimal !== '') {
+    const lastChar = cleanAlert.substring(cleanAlert.length - 1);
+    return rowDecimal === lastChar;
+  }
+
+  return true;
+}
 
 export default function ProgramadaTable({
   startDate,
@@ -36,6 +71,131 @@ export default function ProgramadaTable({
 }) {
   apiUrl = useConfig().apiUrl;
   const { room, docena, porcExtra } = useOutletContext();
+  const location = useLocation();
+  const [activeGroupAlerts, setActiveGroupAlerts] = useState(() => {
+    try {
+      const saved = localStorage.getItem('activeGroupAlerts');
+      return saved ? JSON.parse(saved) : [];
+    } catch (e) {
+      return [];
+    }
+  });
+  const [previousGroups, setPreviousGroups] = useState(() => {
+    try {
+      const saved = localStorage.getItem('previousGroups');
+      return saved ? JSON.parse(saved) : {};
+    } catch (e) {
+      return {};
+    }
+  });
+  const [currentGroups, setCurrentGroups] = useState(() => {
+    try {
+      const saved = localStorage.getItem('currentGroups');
+      return saved ? JSON.parse(saved) : {};
+    } catch (e) {
+      return {};
+    }
+  });
+
+  useEffect(() => {
+    const checkStorage = () => {
+      try {
+        const savedAlerts = localStorage.getItem('activeGroupAlerts');
+        const parsedAlerts = savedAlerts ? JSON.parse(savedAlerts) : [];
+        setActiveGroupAlerts(parsedAlerts);
+
+        const savedPrev = localStorage.getItem('previousGroups');
+        const parsedPrev = savedPrev ? JSON.parse(savedPrev) : {};
+        setPreviousGroups(parsedPrev);
+
+        const savedCurr = localStorage.getItem('currentGroups');
+        const parsedCurr = savedCurr ? JSON.parse(savedCurr) : {};
+        setCurrentGroups(parsedCurr);
+      } catch (e) {}
+    };
+
+    window.addEventListener('groups-refresh', checkStorage);
+
+    const intervalId = setInterval(checkStorage, 5000);
+    return () => {
+      clearInterval(intervalId);
+      window.removeEventListener('groups-refresh', checkStorage);
+    };
+  }, []);
+
+  const acknowledgeGroup = async (styleCode) => {
+    try {
+      const res = await fetch(`${apiUrl}/grupos?_t=${Date.now()}`);
+      if (!res.ok) return;
+      const groupsData = await res.json();
+      
+      const styleStr = String(styleCode).trim();
+      const group = groupsData.find(g => matchStyleAlert(g.style, styleStr));
+      
+      if (group) {
+        const savedAck = localStorage.getItem('acknowledgedGroups');
+        let acknowledgedGroups = savedAck ? JSON.parse(savedAck) : [];
+        if (!Array.isArray(acknowledgedGroups)) acknowledgedGroups = [];
+        
+        const savedPrev = localStorage.getItem('previousGroups');
+        let previousGroups = savedPrev ? JSON.parse(savedPrev) : {};
+        
+        if (!acknowledgedGroups.some(ack => String(ack).trim() === String(group.style).trim())) {
+          acknowledgedGroups.push(group.style);
+        }
+        
+        previousGroups[group.style] = group.maquinas;
+        
+        localStorage.setItem('acknowledgedGroups', JSON.stringify(acknowledgedGroups));
+        localStorage.setItem('previousGroups', JSON.stringify(previousGroups));
+        
+        const savedAlerts = localStorage.getItem('activeGroupAlerts');
+        const currentAlerts = savedAlerts ? JSON.parse(savedAlerts) : [];
+        const newAlerts = currentAlerts.filter(s => String(s).trim() !== String(group.style).trim());
+        localStorage.setItem('activeGroupAlerts', JSON.stringify(newAlerts));
+        
+        setActiveGroupAlerts(newAlerts);
+      }
+    } catch (e) {
+      console.error('[CLIENT] Error acknowledging group:', e);
+    }
+  };
+
+  const acknowledgeAllGroups = async () => {
+    try {
+      const res = await fetch(`${apiUrl}/grupos?_t=${Date.now()}`);
+      if (!res.ok) return;
+      const groupsData = await res.json();
+      
+      const savedAck = localStorage.getItem('acknowledgedGroups');
+      let acknowledgedGroups = savedAck ? JSON.parse(savedAck) : [];
+      if (!Array.isArray(acknowledgedGroups)) acknowledgedGroups = [];
+      
+      const savedPrev = localStorage.getItem('previousGroups');
+      let previousGroups = savedPrev ? JSON.parse(savedPrev) : {};
+      
+      groupsData.forEach(group => {
+        if (!acknowledgedGroups.some(ack => String(ack).trim() === String(group.style).trim())) {
+          acknowledgedGroups.push(group.style);
+        }
+        previousGroups[group.style] = group.maquinas;
+      });
+      
+      localStorage.setItem('acknowledgedGroups', JSON.stringify(acknowledgedGroups));
+      localStorage.setItem('previousGroups', JSON.stringify(previousGroups));
+      localStorage.setItem('activeGroupAlerts', JSON.stringify([]));
+      
+      setActiveGroupAlerts([]);
+    } catch (e) {
+      console.error('[CLIENT] Error acknowledging all groups:', e);
+    }
+  };
+
+  const currentRoomAlertsCount = useMemo(() => {
+    return activeGroupAlerts.filter(alertStyle => 
+      progColor.some(row => matchStyleAlert(alertStyle, row.Articulo))
+    ).length;
+  }, [activeGroupAlerts, progColor]);
 
   useEffect(() => {
     let ignore = false;
@@ -44,12 +204,14 @@ export default function ProgramadaTable({
       if (startDate) {
         const params = new URLSearchParams({
           startDate,
+          _t: Date.now(),
         }).toString();
         fetch(`${apiUrl}/${room}/programada?${params}`)
           .then((res) => res.json())
           .then((data) => {
             if (!ignore) {
               setProgColor(data);
+              localStorage.setItem(`progColor-${room}`, JSON.stringify(data));
             }
           })
           .catch((err) =>
@@ -83,7 +245,7 @@ export default function ProgramadaTable({
         ignore = true;
       };
     }
-  }, [startDate, setProgColor, live]);
+  }, [startDate, setProgColor, live, room]);
 
   const cols = [
     {
@@ -304,23 +466,82 @@ export default function ProgramadaTable({
   function renderRow(row, i, opened, handleClick) {
     const faltaUnidades = calcFaltaUnidades(row);
 
-    const machinesList = row.Machines.map((m) => {
-      return (
-        <Typography key={m.MachCode}>{`${m.MachCode} ${
-          room === 'SEAMLESS' ? `(P: ${localizedNum(m.Pieces)})` : ''
-        }`}</Typography>
-      );
-    }); // display all machines with articulo
+    const isGroupAlertActive = activeGroupAlerts.some(alertStyle => matchStyleAlert(alertStyle, row.Articulo));
+
+    let machinesList;
+    if (isGroupAlertActive) {
+      const matchedPrevKey = Object.keys(previousGroups).find(k => matchStyleAlert(k, row.Articulo));
+      const prevMachines = matchedPrevKey 
+        ? (previousGroups[matchedPrevKey] || []).map(m => String(m).trim())
+        : [];
+
+      const currentMachineCodes = row.Machines.map(m => String(m.MachCode).trim());
+
+      const addedMachines = currentMachineCodes.filter(m => !prevMachines.includes(m));
+      const removedMachines = prevMachines.filter(m => !currentMachineCodes.includes(m));
+
+       const activeList = row.Machines.map((m) => {
+        const isAdded = addedMachines.includes(String(m.MachCode).trim());
+        return (
+          <Typography
+            key={m.MachCode}
+            sx={{
+              color: isAdded ? 'var(--icon-color-success)' : 'inherit',
+              fontWeight: isAdded ? 'bold' : 'normal',
+            }}
+          >
+            {isAdded ? `${m.MachCode} +` : m.MachCode} {room === 'SEAMLESS' ? `(P: ${localizedNum(m.Pieces)})` : ''}
+          </Typography>
+        );
+      });
+
+      const removedList = removedMachines.map((machCode) => {
+        return (
+          <Typography
+            key={`removed-${machCode}`}
+            sx={{
+              color: 'var(--icon-color-danger)',
+              fontWeight: 'bold',
+            }}
+          >
+            {machCode} -
+          </Typography>
+        );
+      });
+
+      machinesList = [...activeList, ...removedList];
+    } else {
+      machinesList = row.Machines.map((m) => {
+        return (
+          <Typography key={m.MachCode}>{`${m.MachCode} ${
+            room === 'SEAMLESS' ? `(P: ${localizedNum(m.Pieces)})` : ''
+          }`}</Typography>
+        );
+      });
+    }
 
     let rowClassName = 'bg-todo';
-    if (!row.Docenas && row.Docenas !== 0)
+    let pulseClass = 'animate-pulse-todo';
+    if (!row.Docenas && row.Docenas !== 0) {
       rowClassName = ''; // NO TIENE DISTR, FALTA ASIGNAR
-    else if (row.Machines.length > 0) rowClassName = 'bg-making'; // TEJIENDO
-    else if (faltaUnidades <= 0) rowClassName = 'bg-done'; // LLEGÓ
-    else if (row.Machines.length === 0 && faltaUnidades <= 24)
+      pulseClass = 'animate-pulse-default';
+    } else if (row.Machines.length > 0) {
+      rowClassName = 'bg-making'; // TEJIENDO
+      pulseClass = 'animate-pulse-making';
+    } else if (faltaUnidades <= 0) {
+      rowClassName = 'bg-done'; // LLEGÓ
+      pulseClass = 'animate-pulse-done';
+    } else if (row.Machines.length === 0 && faltaUnidades <= 24) {
       rowClassName = 'bg-almost-done'; // CASI LLEGÓ - Menos de dos docena
-    else if (row.Machines.length === 0 && faltaUnidades < row.Target)
+      pulseClass = 'animate-pulse-almost-done';
+    } else if (row.Machines.length === 0 && faltaUnidades < row.Target) {
       rowClassName = 'bg-incomplete'; // INCOMPLETO
+      pulseClass = 'animate-pulse-incomplete';
+    }
+
+    if (isGroupAlertActive) {
+      rowClassName = `${rowClassName} ${pulseClass} font-semibold`;
+    }
 
     rowClassName = `${rowClassName} *:border-dark-accent hover:bg-row-hover`;
 
@@ -343,7 +564,7 @@ export default function ProgramadaTable({
             className='font-semibold border-x group/color'
             style={{
               backgroundColor: row.Hex,
-              color: row.WhiteText ? 'white' : 'black',
+              color: row.Hex ? (row.WhiteText ? 'white' : 'black') : 'inherit',
             }}
           >
             <Typography
@@ -380,9 +601,11 @@ export default function ProgramadaTable({
             <td className='text-right'>{localizedNum(faltaUnidades)}</td>
           ) : live ? (
             <td className='text-center'>
-              {calcIdealTime(row) === -1
-                ? 'LLEGÓ'
-                : getDuration(calcIdealTime(row))}
+              {calcIdealTime(row) === -1 ? (
+                'Llegó'
+              ) : (
+                getDuration(calcIdealTime(row))
+              )}
             </td>
           ) : (
             <td className='text-right'>{localizedNum(faltaUnidades)}</td>
@@ -396,7 +619,35 @@ export default function ProgramadaTable({
           {/* Maquinas */}
           {live && (
             <td className={room === 'HOMBRE' ? 'text-center' : ''}>
-              {machinesList}
+              <Stack
+                direction="row"
+                alignItems="center"
+                justifyContent={room === 'HOMBRE' ? 'center' : 'flex-start'}
+                spacing={1}
+                sx={{ pl: room === 'HOMBRE' ? 0 : 1 }}
+              >
+                <Box>{machinesList}</Box>
+                {isGroupAlertActive && (
+                  <IconButton
+                    size="md"
+                    variant="plain"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      acknowledgeGroup(row.Articulo);
+                    }}
+                    sx={{
+                      '--IconButton-size': '32px',
+                      color: 'var(--icon-color-success)',
+                      '&:hover': {
+                        backgroundColor: 'var(--joy-palette-success-softBg)',
+                      },
+                    }}
+                    title="Marcar grupo como revisado"
+                  >
+                    <CheckCircleOutlined sx={{ fontSize: '24px' }} />
+                  </IconButton>
+                )}
+              </Stack>
             </td>
           )}
         </>
@@ -456,22 +707,32 @@ export default function ProgramadaTable({
   return (
     <DatesContext value={{ startDate, fromMonthStart: true, endDate: null }}>
       <EnhancedTable
+        key={live ? 'live' : 'history'}
         cols={cols}
         rows={
-          startDate && progColor && filteredProgColor.length === 0
+          (startDate || live) && progColor && filteredProgColor.length === 0
             ? progColor
             : filteredProgColor
         }
         pdfRows={progColor}
         renderRow={renderRow}
         initOrder='asc'
-        initOrderBy='Articulo'
+        initOrderBy={live ? (room === 'SEAMLESS' ? 'machines' : 'idealTime') : 'Articulo'}
+        storageKey={`${location.pathname}-${room}`}
         footer={[
           'Total',
           footerFormat(totalAProducir), // Total A Producir
           footerFormat(totalProducido), // Total Producido
           footerFormat(totalFalta), // Total Falta
-          !live && room === 'HOMBRE' ? <ProgLegend live={live} /> : true,
+          !live ? (
+            room === 'HOMBRE' ? (
+              <ProgLegend live={live} />
+            ) : (
+              true
+            )
+          ) : (
+            true
+          ),
           !live && room === 'SEAMLESS' ? (
             <ProgLegend live={live} />
           ) : !live && room === 'HOMBRE' ? (

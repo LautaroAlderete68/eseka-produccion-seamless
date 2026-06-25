@@ -190,7 +190,11 @@ export default function EditArticuloForm({ articuloData }) {
 
         {/* color distr */}
         <ErrorContext value={error}>
-          <ColorDistrInputs formData={formData} setFormData={setFormData} />
+          <ColorDistrInputs
+            formData={formData}
+            setFormData={setFormData}
+            articulo={formData.articulo}
+          />
         </ErrorContext>
         {/* submit btn */}
         <Button

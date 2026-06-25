@@ -13,6 +13,7 @@ export default function ModalWrapper({
   isOpen,
   handleClose,
   contentClassName = '',
+  dialogSx = {},
 }) {
   const [open, setOpen] = useState(true);
 
@@ -22,7 +23,7 @@ export default function ModalWrapper({
       onClose={handleClose || (() => setOpen(false))}
     >
       <ModalOverflow>
-        <ModalDialog>
+        <ModalDialog sx={dialogSx}>
           <ModalClose />
           <DialogTitle>{title}</DialogTitle>
           <DialogContent className={contentClassName}>{content}</DialogContent>

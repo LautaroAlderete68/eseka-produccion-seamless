@@ -133,15 +133,13 @@ export default function Home() {
     };
   }, []);
 
-  // reload on room change
+  // update lastRoom on room change without page reload
   useEffect(() => {
     const lastRoom = localStorage.getItem('lastRoom');
     if (lastRoom !== room) {
       localStorage.setItem('lastRoom', room);
-      if (room !== 'ELECTRONICA') window.location.reload();
-    } else if (room === 'ELECTRONICA') {
-      // lastRoom === room, meaning no change, initial render
-      // whenever opening app in ELECTRONICA, redirect to maquinas
+    }
+    if (room === 'ELECTRONICA') {
       navigate('/maquinas');
     }
   }, [room]);
@@ -158,11 +156,11 @@ export default function Home() {
           direction='row'
           className='items-stretch justify-start size-full'
         >
-          <aside className='fixed top-0 bottom-0 left-0 z-20 w-40 h-screen'>
+          <aside className='fixed top-0 bottom-0 left-0 z-20 w-48 h-screen'>
             <NavBar room={room} setRoom={setRoom} />
           </aside>
 
-          <Box className='w-full px-4 ml-40'>
+          <Box className='w-full px-4 ml-48'>
             <Outlet
               context={{
                 addColorCodes,

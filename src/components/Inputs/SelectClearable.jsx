@@ -1,6 +1,6 @@
 import Select from '@mui/joy/Select';
 import IconButton from '@mui/joy/IconButton';
-import CloseRounded from '@mui/icons-material/CloseRounded';
+import CloseOutlined from '@mui/icons-material/CloseOutlined';
 import { useContext, useRef } from 'react';
 import { ErrorContext } from '../../Contexts.js';
 
@@ -46,8 +46,9 @@ export default function SelectClearable({
               setFormData(''); // can't be null for requests
               action.current?.focusVisible();
             }}
+            sx={{ color: 'inherit' }}
           >
-            <CloseRounded />
+            <CloseOutlined />
           </IconButton>
         ),
         indicator: null,

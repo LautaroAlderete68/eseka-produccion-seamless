@@ -1,16 +1,7 @@
 @import 'tailwindcss';
 
-/* :root {
-  --color-done: #ef4351;
-  --color-almost-done: #f68e96;
-  --color-todo: #9ad35b;
-  --color-making: #ffc000;
-  --color-incomplete: #decccc;
-  --color-dark-accent: #272727;
-} */
-
 @theme {
-  /* Theme */
+  /* Theme mapping to Joy UI */
   --color-primary: var(--joy-palette-primary-500);
   --color-neutral-100: var(--joy-palette-neutral-100);
   --color-neutral-200: var(--joy-palette-neutral-200);
@@ -18,35 +9,206 @@
   --color-neutral-400: var(--joy-palette-neutral-400);
   --color-neutral: var(--joy-palette-neutral-500);
 
-  /* Programada table */
-  --color-done: #f05663;
-  --color-almost-done: #f68e96;
-  --color-todo: #9ad35b;
-  --color-making: #ffc000;
-  --color-incomplete: #decccc;
-  --color-dark-accent: #272727;
-  --color-row-hover: #85c7f2;
+  /* Programada table dynamic colors */
+  --color-done: var(--done-bg);
+  --color-almost-done: var(--almost-done-bg);
+  --color-todo: var(--todo-bg);
+  --color-making: var(--making-bg);
+  --color-incomplete: var(--incomplete-bg);
+  --color-dark-accent: var(--dark-accent-border);
+  --color-row-hover: var(--row-hover-bg);
 
-  /* Machine stops */
-  --color-stop-off: var(--color-incomplete);
-  --color-stop-general: #f7b5bd;
-  --color-stop-target: #6f2dbd;
-  --color-stop-electronico: var(--color-making);
-  --color-stop-mecanico: var(--color-done);
-  --color-stop-produccion: #8c2a3f;
-  --color-stop-hilado: #edbe66;
-  --color-stop-repuesto: #f88b32;
-  --color-stop-muestra: var(--color-todo);
-  --color-stop-cambio: #072ac8;
-  --color-stop-turbina: #79e0e2;
+  /* Machine stops dynamic colors */
+  --color-stop-off: var(--incomplete-bg);
+  --color-stop-general: var(--stop-general-bg);
+  --color-stop-target: var(--stop-target-bg);
+  --color-stop-electronico: var(--making-bg);
+  --color-stop-mecanico: var(--done-bg);
+  --color-stop-produccion: var(--stop-produccion-bg);
+  --color-stop-hilado: var(--stop-hilado-bg);
+  --color-stop-repuesto: var(--stop-repuesto-bg);
+  --color-stop-muestra: var(--todo-bg);
+  --color-stop-cambio: var(--stop-cambio-bg);
+  --color-stop-turbina: var(--stop-turbina-bg);
 
   /* Charts */
   --color-chart-green: #87cc3e;
   --color-chart-yellow: #ffc000;
   --color-chart-red: #ed3140;
 
-  /* Cambios */
-  --color-turno-1: var(--color-incomplete);
-  --color-turno-2: var(--color-stop-turbina);
-  --color-turno-3: var(--color-stop-repuesto);
+  /* Shift colors */
+  --color-turno-1: var(--incomplete-bg);
+  --color-turno-2: var(--stop-turbina-bg);
+  --color-turno-3: var(--stop-repuesto-bg);
+}
+
+:root {
+  /* Light mode colors (original palette) */
+  --done-bg: #ff8c94; /* Vibrant soft coral/red for complete */
+  --almost-done-bg: #ffb3ba; /* Vibrant soft pink for almost done */
+  --todo-bg: #a1e37b; /* Vibrant soft lime/green for todo */
+  --making-bg: #93c5fd; /* Vibrant soft blue for making */
+  --incomplete-bg: #e2dbdb; /* Vibrant soft warm gray for incomplete */
+  --dark-accent-border: #e2e8f0; /* Softer gray than solid black for light mode */
+  --row-hover-bg: #e2f1fc; /* Softer light blue hover */
+
+  --todo-bg-pulse: #c2f0ab;
+  --making-bg-pulse: #c3e0fc;
+  --done-bg-pulse: #ffb3b9;
+  --almost-done-bg-pulse: #ffdbe0;
+  --incomplete-bg-pulse: #eee9e9;
+  --default-bg-pulse: #e2e8f0;
+
+  --stop-general-bg: #f7b5bd;
+  --stop-target-bg: #6f2dbd;
+  --stop-produccion-bg: #8c2a3f;
+  --stop-hilado-bg: #edbe66;
+  --stop-repuesto-bg: #f88b32;
+  --stop-cambio-bg: #072ac8;
+  --stop-turbina-bg: #79e0e2;
+
+  /* Produccion Maquinas view variables (Light) */
+  --prod-day-has-pieces: #dbeafe; /* Softer, modern pastel blue */
+  --prod-day-no-pieces: #f4f4f5;  /* Softer neutral gray */
+  --prod-turno-has-pieces: #ffffff;
+  --prod-turno-no-pieces: #fafafa;
+  --prod-maquina-bg: #dcfce7;     /* Softer, modern pastel mint green */
+  --prod-text-color: #09090b;     /* Very dark gray instead of harsh solid black */
+  --prod-text-muted: #71717a;     /* Muted gray for article name */
+
+  /* Status icon colors (defaults to Joy UI theme plain colors) */
+  --icon-color-success: var(--joy-palette-success-plainColor);
+  --icon-color-danger: var(--joy-palette-danger-plainColor);
+  --icon-color-warning: var(--joy-palette-warning-plainColor);
+}
+
+[data-joy-color-scheme="dark"], .dark {
+  /* Dark mode colors - GitHub / VS Code dark mode inspired palette */
+  --done-bg: #9c2830; /* Rich crimson/dark red for complete */
+  --almost-done-bg: #742e33; /* Distinct reddish-brown/rose */
+  --todo-bg: #276b2c; /* Rich forest green for todo */
+  --making-bg: #163a70; /* Rich dark blue for making */
+  --incomplete-bg: #3c4350; /* Solid slate gray for incomplete */
+  --dark-accent-border: #30363d; /* GitHub border gray */
+  --row-hover-bg: #1f2937; /* Dark gray for row hover */
+
+  --todo-bg-pulse: #388e3c;
+  --making-bg-pulse: #21508f;
+  --done-bg-pulse: #b32e3a;
+  --almost-done-bg-pulse: #8f383e;
+  --incomplete-bg-pulse: #4a5363;
+  --default-bg-pulse: #2d3139;
+
+  --stop-general-bg: #52292f;
+  --stop-target-bg: #3f1e63;
+  --stop-produccion-bg: #471a22;
+  --stop-hilado-bg: #543b12;
+  --stop-repuesto-bg: #5c2f0a;
+  --stop-cambio-bg: #0a174d;
+  --stop-turbina-bg: #194a4c;
+
+  /* Neon highlight for status icons in dark mode */
+  --icon-color-success: #00ff87; /* Neon green */
+  --icon-color-danger: #ff3366; /* Neon pink/red */
+  --icon-color-warning: #ffcc00; /* Neon warning yellow */
+
+  /* Produccion Maquinas view variables (Dark) */
+  --prod-day-has-pieces: #1f2d3d;
+  --prod-day-no-pieces: #242526;
+  --prod-turno-has-pieces: #161b22;
+  --prod-turno-no-pieces: #21262d;
+  --prod-maquina-bg: #113622;
+  --prod-text-color: #c9d1d9;
+  --prod-text-muted: #8b949e;
+
+  /* Chart Tooltip overrides for Dark Mode */
+  .MuiChartsTooltip-paper,
+  .MuiChartsTooltip-table,
+  .MuiChartsAxisTooltipContent-root {
+    background-color: var(--joy-palette-background-surface) !important;
+    border-color: var(--joy-palette-divider) !important;
+  }
+
+  .MuiChartsTooltip-cell,
+  .MuiChartsTooltip-valueCell,
+  .MuiChartsAxisTooltipContent-cell,
+  .MuiChartsAxisTooltipContent-valueCell,
+  .MuiChartsAxisTooltipContent-axisValueCell {
+    color: var(--joy-palette-text-primary) !important;
+  }
+
+  .MuiChartsTooltip-labelCell,
+  .MuiChartsAxisTooltipContent-labelCell {
+    color: var(--joy-palette-text-secondary) !important;
+  }
+}
+
+@keyframes pulse-todo {
+  0%, 100% { background-color: var(--todo-bg); }
+  50% { background-color: var(--todo-bg-pulse); }
+}
+@keyframes pulse-making {
+  0%, 100% { background-color: var(--making-bg); }
+  50% { background-color: var(--making-bg-pulse); }
+}
+@keyframes pulse-done {
+  0%, 100% { background-color: var(--done-bg); }
+  50% { background-color: var(--done-bg-pulse); }
+}
+@keyframes pulse-almost-done {
+  0%, 100% { background-color: var(--almost-done-bg); }
+  50% { background-color: var(--almost-done-bg-pulse); }
+}
+@keyframes pulse-incomplete {
+  0%, 100% { background-color: var(--incomplete-bg); }
+  50% { background-color: var(--incomplete-bg-pulse); }
+}
+@keyframes pulse-default {
+  0%, 100% { background-color: transparent; }
+  50% { background-color: var(--default-bg-pulse); }
+}
+
+.animate-pulse-todo {
+  animation: pulse-todo 2s infinite ease-in-out;
+}
+.animate-pulse-making {
+  animation: pulse-making 2s infinite ease-in-out;
+}
+.animate-pulse-done {
+  animation: pulse-done 2s infinite ease-in-out;
+}
+.animate-pulse-almost-done {
+  animation: pulse-almost-done 2s infinite ease-in-out;
+}
+.animate-pulse-incomplete {
+  animation: pulse-incomplete 2s infinite ease-in-out;
+}
+.animate-pulse-default {
+  animation: pulse-default 2s infinite ease-in-out;
+}
+
+@keyframes spin-once {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.animate-spin-2s {
+  animation: spin-once 2.0s ease-in-out;
+}
+
+@keyframes pulse-breathing-yellow {
+  0%, 100% {
+    background-color: transparent;
+  }
+  50% {
+    background-color: rgba(245, 158, 11, 0.2);
+  }
+}
+
+.animate-pulse-breathing-yellow {
+  animation: pulse-breathing-yellow 2s infinite ease-in-out;
 }

@@ -1,6 +1,6 @@
-import CheckCircleRounded from '@mui/icons-material/CheckCircleRounded';
-import CloseRounded from '@mui/icons-material/CloseRounded';
-import ErrorRounded from '@mui/icons-material/ErrorRounded';
+import CheckCircleOutlined from '@mui/icons-material/CheckCircleOutlined';
+import CloseOutlined from '@mui/icons-material/CloseOutlined';
+import ErrorOutline from '@mui/icons-material/ErrorOutline';
 import IconButton from '@mui/joy/IconButton';
 import Snackbar from '@mui/joy/Snackbar';
 import { useState } from 'react';
@@ -8,7 +8,7 @@ import { useState } from 'react';
 export default function Toast({ toast, removeToast }) {
   const [open, setOpen] = useState(true);
   const startDecorator =
-    toast.type === 'success' ? <CheckCircleRounded /> : <ErrorRounded />;
+    toast.type === 'success' ? <CheckCircleOutlined /> : <ErrorOutline />;
 
   const closeToast = (id) => {
     setOpen(false);
@@ -39,7 +39,7 @@ export default function Toast({ toast, removeToast }) {
           color={toast.type}
           onClick={() => closeToast(toast.id)}
         >
-          <CloseRounded />
+          <CloseOutlined />
         </IconButton>
       }
     >

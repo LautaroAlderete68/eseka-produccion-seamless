@@ -168,7 +168,11 @@ export default function NewArticuloForm({
 
         {/* color distr */}
         <ErrorContext value={error}>
-          <ColorDistrInputs formData={formData} setFormData={setFormData} />
+          <ColorDistrInputs
+            formData={formData}
+            setFormData={setFormData}
+            articulo={newArticuloData.articulo}
+          />
         </ErrorContext>
         {/* submit btn */}
         <Button

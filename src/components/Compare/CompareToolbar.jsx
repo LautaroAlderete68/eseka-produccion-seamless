@@ -3,7 +3,7 @@ import { useConfig } from '../../ConfigContext.jsx';
 import Button from '@mui/joy/Button';
 import Stack from '@mui/joy/Stack';
 import ChangeCircleOutlined from '@mui/icons-material/ChangeCircleOutlined';
-import CompareArrowsRounded from '@mui/icons-material/CompareArrowsRounded';
+import CompareArrowsOutlined from '@mui/icons-material/CompareArrowsOutlined';
 import LibraryAddOutlined from '@mui/icons-material/LibraryAddOutlined';
 
 export default function CompareToolbar({
@@ -145,7 +145,7 @@ export default function CompareToolbar({
           onClick={handleCompare}
           // can compare only if there is reference date
           disabled={startDate === null}
-          startDecorator={<CompareArrowsRounded />}
+          startDecorator={<CompareArrowsOutlined />}
         >
           Comparar
         </Button>

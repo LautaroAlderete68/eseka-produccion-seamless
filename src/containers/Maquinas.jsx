@@ -9,15 +9,14 @@ import Tab, { tabClasses } from '@mui/joy/Tab';
 import TabList from '@mui/joy/TabList';
 import TabPanel from '@mui/joy/TabPanel';
 import Tabs from '@mui/joy/Tabs';
-import MapTwoTone from '@mui/icons-material/MapTwoTone';
-import TableChartTwoTone from '@mui/icons-material/TableChartTwoTone';
+import MapOutlined from '@mui/icons-material/MapOutlined';
+import TableChartOutlined from '@mui/icons-material/TableChartOutlined';
 import MaquinasMap from '../components/MaquinasMap.jsx';
 import { useOutletContext } from 'react-router';
 import { ToastsContext } from '../Contexts.js';
 import dayjs from 'dayjs';
-import Checkbox from '@mui/joy/Checkbox';
-import List from '@mui/joy/List';
-import ListItem from '@mui/joy/ListItem';
+import Switch from '@mui/joy/Switch';
+import ElectricBoltOutlined from '@mui/icons-material/ElectricBoltOutlined';
 import { playAlertSound } from '../utils/playAlertSound.js';
 import sendTelegramAlert from '../utils/sendTelegramAlert.js';
 
@@ -32,15 +31,7 @@ export default function Maquinas() {
   const [defaultTab, setDefaultTab] = useState(
     JSON.parse(localStorage.getItem('machTab')) || 0
   );
-  // Algodón, Seamless, Nylon
-  const [selectedRooms, setSelectedRooms] = useState(
-    JSON.parse(localStorage.getItem('selectedRooms')) || [true, true, true]
-  );
-
-  // Update localStorage when selectedRooms changes
-  useEffect(() => {
-    localStorage.setItem('selectedRooms', JSON.stringify(selectedRooms));
-  }, [selectedRooms]);
+  const [onlyStopElectronico, setOnlyStopElectronico] = useState(false);
 
   const getMachines = () => {
     fetch(`${apiUrl}/${room}/machines`)
@@ -48,15 +39,7 @@ export default function Maquinas() {
       .then((data) => {
         let machs = [...data];
 
-        if (room === 'ELECTRONICA') {
-          // filter machines based on selectedRooms
-          selectedRooms.forEach((room, i) => {
-            const RoomCode =
-              i === 0 ? 'HOMBRE' : i === 1 ? 'SEAMLESS' : 'MUJER';
-            if (!room)
-              machs = machs.filter((m) => !m.RoomCode.startsWith(RoomCode));
-          });
-        }
+        // No room filtering for ELECTRONICA anymore. All rooms are always fetched.
 
         setMachines(machs);
       })
@@ -78,11 +61,18 @@ export default function Maquinas() {
       ignore = true;
       clearInterval(intervalId);
     };
-  }, [room, selectedRooms]);
+  }, [room]);
+
+  const displayedMachines = useMemo(() => {
+    if (room === 'ELECTRONICA' && onlyStopElectronico) {
+      return machines.filter((m) => m.State === 6);
+    }
+    return machines;
+  }, [machines, room, onlyStopElectronico]);
 
   const sortedMachines = useMemo(
-    () => [...machines].sort((a, b) => a.MachCode - b.MachCode),
-    [machines]
+    () => [...displayedMachines].sort((a, b) => a.MachCode - b.MachCode),
+    [displayedMachines]
   );
 
   const sortedFiltered = useMemo(
@@ -179,28 +169,38 @@ export default function Maquinas() {
         >
           <Tab disableIndicator>
             <ListItemDecorator>
-              <MapTwoTone />
+              <MapOutlined />
             </ListItemDecorator>
             Mapa
           </Tab>
           <Tab disableIndicator>
             <ListItemDecorator>
-              <TableChartTwoTone />
+              <TableChartOutlined />
             </ListItemDecorator>
             Tabla
           </Tab>
         </TabList>
 
         {room === 'ELECTRONICA' && (
-          <RoomCheckboxes
-            selectedRooms={selectedRooms}
-            setSelectedRooms={setSelectedRooms}
+          <Switch
+            checked={onlyStopElectronico}
+            onChange={(e) => setOnlyStopElectronico(e.target.checked)}
+            startDecorator={
+              <ElectricBoltOutlined
+                sx={{
+                  color: onlyStopElectronico
+                    ? 'var(--joy-palette-warning-solidBg)'
+                    : 'inherit',
+                }}
+              />
+            }
+            endDecorator='Stop Electrónico'
           />
         )}
 
         {/* search inputs */}
         <MachSearchForm
-          machines={machines}
+          machines={displayedMachines}
           setFilteredMachines={setFilteredMachines}
         />
       </Stack>
@@ -211,13 +211,15 @@ export default function Maquinas() {
           machines={
             filteredMachines.length > 0 ? sortedFiltered : sortedMachines
           }
-          selectedRooms={selectedRooms}
+          selectedRooms={[true, true, true]}
         />
       </TabPanel>
       <TabPanel value={1} className='p-0'>
         <MaquinasTable
-          machines={filteredMachines.length > 0 ? filteredMachines : machines}
-          pdfRows={machines}
+          machines={
+            filteredMachines.length > 0 ? filteredMachines : displayedMachines
+          }
+          pdfRows={displayedMachines}
         />
       </TabPanel>
     </Tabs>
@@ -248,32 +250,4 @@ function sendNotification(electronicoMachs) {
   sendTelegramAlert(notif.body + ' ⚠️');
 }
 
-function RoomCheckboxes({ selectedRooms, setSelectedRooms }) {
-  return (
-    <div role='group' aria-labelledby='room'>
-      <List
-        orientation='horizontal'
-        wrap
-        sx={{ '--List-gap': '8px', '--ListItem-radius': '20px' }}
-      >
-        {['Algodón', 'Seamless', 'Nylon'].map((item, i) => (
-          <ListItem key={item}>
-            <Checkbox
-              overlay
-              disableIcon
-              variant='soft'
-              label={item}
-              checked={selectedRooms[i]}
-              onChange={(e) => {
-                const newRooms = [...selectedRooms];
-                newRooms[i] = e.target.checked;
-                setSelectedRooms(newRooms);
-                // localStorage update now handled in parent useEffect
-              }}
-            />
-          </ListItem>
-        ))}
-      </List>
-    </div>
-  );
-}
+// RoomCheckboxes removed

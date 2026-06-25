@@ -1,0 +1,729 @@
+{
+    "5320": {
+        "CRUDO": [
+            "NEGRO",
+            "BLANCO",
+            "NUT"
+        ]
+    },
+    "11722": {
+        "NEGRO GRIS": [
+            "NEGRO"
+        ]
+    },
+    "5223": {
+        "NEGRO AZUL": ["AZUL (CORROBORAR)"],
+	"NEGRO GRIS": ["NEGRO"]
+    },
+    "12865": {
+        "APRICOT": ["APRICOT"],
+        "NEGRO": ["NEGRO"],
+        "PETRÓLEO": ["PETRÓLEO"]
+    },
+    "11710": {
+        "GRIS BLANCO": ["PERLA"],
+        "NEGRO AZUL": ["MARINO"],
+        "NEGRO GRIS": ["GRIS"],
+	"NEGRO ROJO": ["ROJO"]
+    },
+    "11731": {
+        "MELANGE NEGRO": ["NEGRO"],
+        "MELANGE BORDÓ": ["BORDÓ"],
+        "MELANGE MARINO": ["MARINO"],
+	"MELANGE AERO": ["AERO"],
+	"MELANGE VERDE": ["VERDE"],
+	"MELANGE FRANCIA": ["FRANCIA"],
+	"MELANGE MELANGE": ["MELANGE"]
+    },
+    "6119": {
+        "CRUDO": [
+            "NEGRO",
+            "BLANCO",
+            "NUT"
+        ]
+    },
+    "12866": {
+        "APRICOT": ["APRICOT"],
+        "NEGRO": ["NEGRO"],
+        "PETRÓLEO": ["PETRÓLEO"]
+    },
+    "11798": {
+        "MELANGE BLANCO": ["BLANCO"],
+        "MELANGE NEGRO": ["NEGRO"],
+        "MELANGE ROJO": ["ROJO"]
+    },
+    "12867": {
+        "APRICOT": ["APRICOT"],
+        "NEGRO": ["NEGRO"],
+        "PETRÓLEO": ["PETRÓLEO"]
+    },
+    "12868": {
+        "APRICOT": ["APRICOT"],
+        "NEGRO": ["NEGRO"],
+        "PETRÓLEO": ["PETRÓLEO"]
+    },
+    "12869": {
+        "APRICOT": ["APRICOT"],
+        "NEGRO": ["NEGRO"],
+        "PETRÓLEO": ["PETRÓLEO"]
+    },
+    "12870": {
+        "APRICOT": ["APRICOT"],
+        "NEGRO": ["NEGRO"],
+        "PETRÓLEO": ["PETRÓLEO"]
+    },
+    "12871": {
+        "NEGRO": ["NEGRO"],
+        "PETRÓLEO": ["PETRÓLEO"]
+    },
+    "10122": {
+        "NEGRO TURQUESA": [
+            "TURQUESA"
+        ],
+        "NEGRO NARANJA": [
+            "LADRILLO"
+        ]
+    },
+    "10123": {
+        "NEGRO TURQUESA": [
+            "TURQUESA"
+        ],
+        "NEGRO NARANJA": [
+            "LADRILLO"
+        ]
+    },
+    "10125": {
+        "NEGRO TURQUESA": [
+            "TURQUESA"
+        ],
+        "NEGRO NARANJA": [
+            "LADRILLO"
+        ]
+    },
+    "5394": {
+        "CRUDO": [
+            "NEGRO",
+            "BLANCO",
+            "NUT"
+        ]
+    },
+    "5533": {
+        "CRUDO": [
+            "NEGRO",
+            "BLANCO",
+            "NUT"
+        ]
+    },
+    "5653": {
+        "CRUDO": [
+            "NEGRO",
+            "BLANCO",
+            "NUT"
+        ]
+    },
+    "5537.1": {
+        "CRUDO": [
+            "NEGRO",
+            "BLANCO",
+            "NUT"
+        ]
+    },
+    "5538.1": {
+        "CRUDO": [
+            "NEGRO",
+            "BLANCO",
+            "NUT"
+        ]
+    },
+    "5539.1": {
+        "CRUDO": [
+            "NEGRO",
+            "BLANCO",
+            "NUT"
+        ]
+    },
+    "6329.1": {
+        "CRUDO": [
+            "NEGRO",
+            "BLANCO",
+            "NUT",
+            "TIERRA"
+        ]
+    },
+    "6331.1": {
+        "CRUDO": [
+            "NEGRO",
+            "BLANCO",
+            "NUT",
+            "TIERRA"
+        ]
+    },
+    "6427.1": {
+        "MELANGE NEGRO": [
+            "MELANGE"
+        ]
+    },
+    "6429.1": {
+        "CRUDO": [
+            "NEGRO",
+            "BLANCO"
+        ]
+    },
+    "6787": {
+        "CRUDO": [
+            "NEGRO",
+            "BLANCO",
+            "NUT"
+        ]
+    },
+    "9060": {
+        "CRUDO": [
+            "NEGRO",
+            "BLANCO",
+            "NUT"
+        ]
+    },
+    "9061": {
+        "CRUDO": [
+            "NEGRO",
+            "BLANCO",
+            "NUT"
+        ]
+    },
+    "9064": {
+        "CRUDO": [
+            "NEGRO",
+            "BLANCO",
+            "NUT"
+        ]
+    },
+    "5655": {
+        "CRUDO": [
+            "NEGRO",
+            "BLANCO",
+            "NUT"
+        ]
+    },
+    "6328": {
+        "CRUDO": [
+            "NEGRO",
+            "BLANCO",
+            "NUT"
+        ]
+    },
+    "6333": {
+        "CRUDO": [
+            "NEGRO",
+            "BLANCO",
+            "NUT"
+        ]
+    },
+    "5757": {
+        "CRUDO": [
+            "NEGRO",
+            "BLANCO",
+            "NUT"
+        ]
+    },
+    "5007": {
+        "CRUDO": [
+            "NEGRO",
+            "BLANCO"
+        ]
+    },
+    "7500": {
+        "CRUDO": [
+            "NEGRO",
+            "NUT"
+        ]
+    },
+    "7501": {
+        "CRUDO": [
+            "NEGRO",
+            "NUT"
+        ]
+    },
+    "7502": {
+        "CRUDO": [
+            "NEGRO",
+            "NUT"
+        ]
+    },
+    "7503": {
+        "CRUDO": [
+            "NEGRO",
+            "NUT"
+        ]
+    },
+    "7504": {
+        "CRUDO": [
+            "NEGRO",
+            "NUT"
+        ]
+    },
+    "7505": {
+        "CRUDO": [
+            "NEGRO",
+            "NUT"
+        ]
+    },
+    "5449": {
+        "BLANCO CORAZONES": [
+            "BLANCO"
+        ],
+        "ROSA MARIPOSAS": [
+            "ROSA"
+        ]
+    },
+    "5042": {
+        "CRUDO": [
+            "BLANCO",
+            "NEGRO"
+        ]
+    },
+    "6391.1": {
+        "POAL BLANCO": [
+            "NEGRO"
+        ],
+        "POAL GRIS": [
+            "LILA",
+            "PETROLEO"
+        ]
+    },
+    "6393.1": {
+        "POAL BLANCO": [
+            "NEGRO"
+        ],
+        "POAL GRIS": [
+            "LILA",
+            "PETROLEO"
+        ]
+    },
+    "6395.1": {
+        "CRUDO GRIS": [
+            "NEGRO",
+            "BLANCO",
+            "ROSA"
+        ]
+    },
+    "6797": {
+        "CRUDO MELANGE": [
+            "MELANGE"
+        ]
+    },
+    "6797.7": {
+        "CRUDO MELANGE": [
+            "MELANGE"
+        ]
+    },
+    "10219": {
+        "CRUDO": [
+            "NEGRO"
+        ]
+    },
+    "10259": {
+        "CRUDO": [
+            "NEGRO",
+            "JEAN"
+        ]
+    },
+    "10222": {
+        "CRUDO GRIS": [
+            "NEGRO"
+        ]
+    },
+    "10260": {
+        "CRUDO": [
+            "NEGRO",
+            "JEAN"
+        ]
+    },
+    "10261": {
+        "CRUDO": [
+            "NEGRO",
+            "JEAN"
+        ]
+    },
+    "10262": {
+        "CRUDO": [
+            "NEGRO",
+            "JEAN"
+        ]
+    },
+    "10263": {
+        "CRUDO": [
+            "NEGRO",
+            "APRICOT"
+        ]
+    },
+    "10264": {
+        "CRUDO": [
+            "NEGRO",
+            "APRICOT"
+        ]
+    },
+    "10265": {
+        "CRUDO": [
+            "NEGRO",
+            "APRICOT"
+        ]
+    },
+    "10266": {
+        "CRUDO": [
+            "NEGRO",
+            "APRICOT"
+        ]
+    },
+    "10267": {
+        "CRUDO": [
+            "NEGRO",
+            "APRICOT"
+        ]
+    },
+    "10268": {
+        "MELANGE NEGRO": [
+            "MELANGE"
+        ]
+    },
+    "10269": {
+        "MELANGE NEGRO": [
+            "MELANGE"
+        ]
+    },
+    "10270": {
+        "MELANGE NEGRO": [
+            "MELANGE"
+        ]
+    },
+    "10286": {
+        "GRIS MELANGE": [
+            "ACERO"
+        ]
+    },
+    "10287": {
+        "GRIS MELANGE": [
+            "ACERO"
+        ]
+    },
+    "10288": {
+        "GRIS MELANGE": [
+            "ACERO"
+        ]
+    },
+    "10289": {
+        "GRIS MELANGE": [
+            "ACERO"
+        ]
+    },
+    "10290": {
+        "GRIS NEGRO": [
+            "NEGRO"
+        ]
+    },
+    "10291": {
+        "GRIS NEGRO": [
+            "NEGRO"
+        ]
+    },
+    "10292": {
+        "GRIS NEGRO": [
+            "NEGRO"
+        ]
+    },
+    "10293": {
+        "GRIS NEGRO": [
+            "NEGRO"
+        ]
+    },
+    "10294": {
+        "ROSA": [
+            "ROSA"
+        ],
+        "VERDE": [
+            "VERDE"
+        ]
+    },
+    "10295": {
+        "ROSA": [
+            "ROSA"
+        ],
+        "VERDE": [
+            "VERDE"
+        ]
+    },
+    "10296": {
+        "ROSA": [
+            "ROSA"
+        ],
+        "VERDE": [
+            "VERDE"
+        ]
+    },
+    "11737": {
+        "MELANGE NEGRO": [
+            "NEGRO"
+        ],
+        "MELANGE MARINO": [
+            "MARINO"
+        ],
+        "MELANGE FRANCIA": [
+            "FRANCIA"
+        ],
+        "MELANGE AERO": [
+            "AERO"
+        ],
+        "MELANGE MELANGE": [
+            "MELANGE"
+        ],
+        "MELANGE BORDÓ": [
+            "BORDO"
+        ],
+        "MELANGE VERDE": [
+            "VERDE"
+        ]
+    },
+    "11774": {
+        "D3 NEGRO": [
+            "NEGRO"
+        ],
+        "D2 BLANCO": [
+            "BLANCO"
+        ],
+        "D1 FRANCIA": [
+            "NÁUTICO"
+        ]
+    },
+    "11788": {
+        "NEGRO BLANCO": [
+            "NEGRO"
+        ],
+        "MELANGE NEGRO": [
+            "MELANGE"
+        ],
+        "NEGRO AZUL": [
+            "MARINO"
+        ],
+        "NEGRO ROJO": [
+            "ROJO",
+            "BORDO"
+        ]
+    },
+    "11789": {
+        "NEGRO BLANCO": [
+            "NEGRO"
+        ],
+        "NEGRO FRANCIA": [
+            "FRANCIA"
+        ],
+        "AZUL ROJO": [
+            "ROJO"
+        ]
+    },
+    "11812": {
+        "NEGRO BLANCO": [
+            "NEGRO"
+        ],
+        "NEGRO ROJO": [
+            "ROJO"
+        ],
+        "NEGRO FRANCIA": [
+            "NÁUTICO"
+        ]
+    },
+    "11855": {
+        "MELANGE NEGRO": [
+            "NEGRO"
+        ],
+        "MELANGE ROJO": [
+            "ROJO"
+        ],
+        "MELANGE FRANCIA": [
+            "NÁUTICO"
+        ]
+    },
+    "11881": {
+        "CRUDO FRANCIA": [
+            "NEGRO",
+            "MARINO",
+            "NÁUTICO"
+        ]
+    },
+    "12093": {
+        "CRUDO GRIS": [
+            "NEGRO",
+            "ROJO",
+            "NÁUTICO"
+        ]
+    },
+    "11869": {
+        "POAL BLANCO": [
+            "NEGRO",
+            "ROJO",
+            "JEAN"
+        ]
+    },
+    "51000": {
+        "CRUDO": [
+            "NEGRO",
+            "BLANCO",
+            "NUT"
+        ]
+    },
+    "51001.1": {
+        "CRUDO": [
+            "NEGRO",
+            "BLANCO",
+            "NUT"
+        ]
+    },
+    "51002.1": {
+        "CRUDO": [
+            "NEGRO",
+            "BLANCO",
+            "NUT"
+        ]
+    },
+    "51003.1": {
+        "CRUDO": [
+            "NEGRO",
+            "BLANCO",
+            "NUT"
+        ]
+    },
+    "51004.1": {
+        "CRUDO": [
+            "NEGRO",
+            "BLANCO",
+            "NUT"
+        ]
+    },
+    "6793": {
+        "CRUDO": [
+            "NEGRO",
+            "BLANCO",
+            "NUT"
+        ]
+    },
+    "6795": {
+        "CRUDO": [
+            "NEGRO",
+            "BLANCO",
+            "NUT"
+        ]
+    },
+    "11940": {
+        "NEGRO": [
+            "NEGRO"
+        ]
+    },
+    "4891": {
+        "CRUDO GRIS": [
+            "OLIVA",
+            "CASTAÑA",
+            "CELESTE LAVANDA",
+            "CORAL"
+        ]
+    },
+    "4893": {
+        "CRUDO GRIS": [
+            "OLIVA",
+            "CASTAÑA",
+            "NEGRO",
+            "CELESTE LAVANDA",
+            "CORAL"
+        ]
+    },
+    "5172": {
+        "CRUDO GRIS": [
+            "OLIVA",
+            "CASTAÑA",
+            "NEGRO",
+            "CELESTE LAVANDA",
+            "CORAL"
+        ]
+    },
+    "5173": {
+        "CRUDO GRIS": [
+            "OLIVA",
+            "CASTAÑA",
+            "NEGRO",
+            "CELESTE LAVANDA",
+            "CORAL"
+        ]
+    },
+    "11941": {
+        "NEGRO": [
+            "NEGRO"
+        ]
+    },
+    "11927": {
+        "CRUDO": [
+            "NEGRO",
+            "BLANCO"
+        ]
+    },
+    "6388": {
+        "CRUDO": [
+            "NEGRO",
+            "BLANCO"
+        ]
+    },
+    "6428": {
+        "CRUDO GRIS": [
+            "NEGRO",
+            "BLANCO"
+        ]
+    },
+    "6431.1": {
+        "CRUDO": [
+            "NEGRO",
+            "BLANCO"
+        ]
+    },
+    "11943": {
+        "CRUDO MELANGE": [
+            "BLANCO",
+            "MARINO",
+            "NÁUTICO"
+        ]
+    },
+    "12050": {
+        "CRUDO GRIS": [
+            "NEGRO",
+            "MARINO",
+            "ROJO"
+        ],
+        "CRUDO NEGRO": [
+            "GRIS"
+        ]
+    },
+    "12050.45": {
+        "GRIS GRIS": ["GRIS"],
+	"GRIS ROJO": ["ROJO"],
+	"GRIS NEGRO": ["NEGRO"],
+	"GRIS MOSTAZA": ["MOSTAZA"],
+	"GRIS MARINO": ["MARINO"],
+	"GRIS FRANCIA": ["FRANCIA"],
+	"GRIS BORDÓ": ["MALBEC"],
+	"NEGRO NARANJA": ["LADRILLO"],
+	"VERDE": ["VERDE"]
+    },
+    "12056": {
+        "CRUDO GRIS": [
+            "NEGRO",
+            "MARINO"
+        ],
+        "CRUDO NEGRO": [
+            "GRIS",
+            "VERDE MILITAR"
+        ]
+    },
+    "12062": {
+        "POAL BLANCO": [
+            "NEGRO",
+            "JEAN",
+            "GRIS",
+            "BORDO"
+        ]
+    }
+}

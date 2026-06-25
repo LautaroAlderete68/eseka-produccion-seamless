@@ -1,6 +1,6 @@
 import IconButton from '@mui/joy/IconButton';
 import Stack from '@mui/joy/Stack';
-import RestartAltRounded from '@mui/icons-material/RestartAltRounded';
+import RestartAltOutlined from '@mui/icons-material/RestartAltOutlined';
 import RefreshBtn from '../RefreshBtn.jsx';
 import { StyledDatePicker } from '../Inputs/StyledPickers.jsx';
 import ProgTotal from '../ProgTotal.jsx';
@@ -54,7 +54,7 @@ export default function DateTotalToolbar({
             setCurrTotal(0); // to trigger a re-render
           }}
         >
-          <RestartAltRounded />
+          <RestartAltOutlined />
         </IconButton>
       </Stack>
 

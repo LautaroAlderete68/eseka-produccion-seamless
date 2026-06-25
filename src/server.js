@@ -6,12 +6,15 @@ const cors = require('cors');
 const dayjs = require('dayjs');
 const utc = require('dayjs/plugin/utc');
 const timezone = require('dayjs/plugin/timezone');
+const fs = require('fs');
+const path = require('path');
 // Utils
 const serverLog = require('./utils/serverLog.js');
 const processPDF = require('./utils/processPDF.js');
 const compareProgramada = require('./utils/compareProgramada.js');
 const calculateNewTargets = require('./utils/calculateNewTargets.js');
 const parseMachines = require('./utils/parseMachines.js');
+const parseStyleCode = require('./utils/parseStyleCode.js');
 const exportTablePDF = require('./utils/exportTablePDF.js');
 const calcEff = require('./utils/calcEff.js');
 // Queries
@@ -23,8 +26,10 @@ const testData = require('./utils/test-data');
 let isPackaged; //= false;
 // once main sends a message to server
 process.parentPort.once('message', (e) => {
-  isPackaged = e.data;
-  serverLog(`isPackaged: ${isPackaged}`);
+  // If DB_SERVER is defined in the .env, connect to the database even in dev mode
+  isPackaged = e.data || !!process.env.DB_SERVER;
+  serverLog(`isPackaged (Electron): ${e.data}`);
+  serverLog(`Database connection enabled: ${!!process.env.DB_SERVER}`);
   startServer();
 });
 
@@ -51,6 +56,68 @@ const config = {
   },
 };
 
+// Load equivalencias.json from Scripts folder
+const getEquivalencias = () => {
+  const paths = [
+    path.join(__dirname, '../Scripts/equivalencias.json'),
+    path.join(__dirname, 'Scripts/equivalencias.json'),
+    'C:\\Users\\lauta\\Desktop\\CODIGO\\ESEKA\\TejeduriaAPP\\APP\\eseka-produccion-seamless\\Scripts\\equivalencias.json'
+  ];
+  for (const p of paths) {
+    if (fs.existsSync(p)) {
+      try {
+        const content = fs.readFileSync(p, 'utf8');
+        return JSON.parse(content);
+      } catch (e) {
+        serverLog(`[ERROR] Parsing equivalencias at ${p}: ${e}`);
+      }
+    }
+  }
+  return {};
+};
+
+// Map DateTime to Day and Shift (Turno)
+const obtenerDiaYTurno = (dtStr) => {
+  const dt = dayjs(dtStr).tz('America/Buenos_Aires');
+  const hour = dt.hour();
+  const minute = dt.minute();
+  const second = dt.second();
+
+  const totalSeconds = hour * 3600 + minute * 60 + second;
+  const sixAm = 6 * 3600;
+  const twoPm = 14 * 3600;
+  const tenPm = 22 * 3600;
+
+  let date;
+  let turno;
+
+  if (totalSeconds === sixAm) {
+    date = dt.subtract(1, 'day').format('YYYY-MM-DD');
+    turno = 3;
+  } else if (totalSeconds === twoPm) {
+    date = dt.format('YYYY-MM-DD');
+    turno = 1;
+  } else if (totalSeconds === tenPm) {
+    date = dt.format('YYYY-MM-DD');
+    turno = 2;
+  } else if (totalSeconds > sixAm && totalSeconds < twoPm) {
+    date = dt.format('YYYY-MM-DD');
+    turno = 1;
+  } else if (totalSeconds > twoPm && totalSeconds < tenPm) {
+    date = dt.format('YYYY-MM-DD');
+    turno = 2;
+  } else if (totalSeconds > tenPm) {
+    date = dt.format('YYYY-MM-DD');
+    turno = 3;
+  } else {
+    // 00:00 -> 05:59
+    date = dt.subtract(1, 'day').format('YYYY-MM-DD');
+    turno = 3;
+  }
+
+  return { date, turno };
+};
+
 const startServer = () => {
   let pool;
   if (isPackaged) {
@@ -58,6 +125,23 @@ const startServer = () => {
       try {
         pool = await sql.connect(config.db);
         serverLog('Connected to database');
+        
+        // Auto-create APP_ARTICULOS_ESPECIALES table if it doesn't exist
+        try {
+          await pool.request().query(`
+            IF NOT EXISTS (SELECT * FROM sysobjects WHERE name='APP_ARTICULOS_ESPECIALES' AND xtype='U')
+            BEGIN
+                CREATE TABLE APP_ARTICULOS_ESPECIALES (
+                    ArticuloBase INT PRIMARY KEY
+                );
+                INSERT INTO APP_ARTICULOS_ESPECIALES (ArticuloBase) VALUES 
+                (2398), (2621), (2622), (3352), (3356), (3668), (3354);
+            END
+          `);
+          serverLog('APP_ARTICULOS_ESPECIALES table checked/created successfully');
+        } catch (e) {
+          serverLog(`[ERROR] Creating APP_ARTICULOS_ESPECIALES table: ${e}`);
+        }
       } catch (err) {
         serverLog(`[ERROR] Error connecting to database: ${err}`);
       }
@@ -351,6 +435,60 @@ const startServer = () => {
     }
   });
 
+  app.get('/articulos-especiales', async (req, res) => {
+    serverLog('GET /articulos-especiales');
+    if (isPackaged) {
+      try {
+        const result = await pool.request().query('SELECT ArticuloBase FROM APP_ARTICULOS_ESPECIALES ORDER BY ArticuloBase');
+        res.json(result.recordset.map(row => row.ArticuloBase));
+      } catch (err) {
+        serverLog(`[ERROR] GET /articulos-especiales: ${err}`);
+        res.json([2398, 2621, 2622, 3352, 3356, 3668, 3354]);
+      }
+    } else {
+      res.json([2398, 2621, 2622, 3352, 3356, 3668, 3354]);
+    }
+  });
+
+  app.post('/articulos-especiales', async (req, res) => {
+    serverLog('POST /articulos-especiales');
+    const { articulo } = req.body;
+    if (!articulo || isNaN(parseInt(articulo))) {
+      return res.status(400).json({ error: 'Artículo inválido' });
+    }
+    if (isPackaged) {
+      try {
+        await pool.request()
+          .input('articulo', sql.Int, parseInt(articulo))
+          .query('INSERT INTO APP_ARTICULOS_ESPECIALES (ArticuloBase) VALUES (@articulo)');
+        res.json({ message: `Artículo ${articulo} agregado con éxito.` });
+      } catch (err) {
+        serverLog(`[ERROR] POST /articulos-especiales: ${err}`);
+        res.status(500).json({ error: err.message });
+      }
+    } else {
+      res.json({ message: `Artículo ${articulo} agregado con éxito (modo test).` });
+    }
+  });
+
+  app.delete('/articulos-especiales/:articulo', async (req, res) => {
+    const { articulo } = req.params;
+    serverLog(`DELETE /articulos-especiales/${articulo}`);
+    if (isPackaged) {
+      try {
+        await pool.request()
+          .input('articulo', sql.Int, parseInt(articulo))
+          .query('DELETE FROM APP_ARTICULOS_ESPECIALES WHERE ArticuloBase = @articulo');
+        res.json({ message: `Artículo ${articulo} eliminado con éxito.` });
+      } catch (err) {
+        serverLog(`[ERROR] DELETE /articulos-especiales: ${err}`);
+        res.status(500).json({ error: err.message });
+      }
+    } else {
+      res.json({ message: `Artículo ${articulo} eliminado con éxito (modo test).` });
+    }
+  });
+
   app.post('/export/pdf', async (req, res) => {
     serverLog('POST /export/pdf');
 
@@ -525,7 +663,467 @@ const startServer = () => {
     }
   });
 
+  app.get('/offline', async (req, res) => {
+    serverLog('GET /offline');
+
+    if (isPackaged) {
+      try {
+        const result = await queries.getOfflineMachines(pool);
+        res.json(result.recordset);
+      } catch (err) {
+        serverLog(`[ERROR] GET /offline: ${err}`);
+        res.status(500).json({ error: err.message });
+      }
+    } else {
+      // test data
+      serverLog('Using test data for /offline');
+      res.json(testData.offline);
+    }
+  });
+
+  app.get('/color-codes/search', async (req, res) => {
+    const { articulo } = req.query;
+    serverLog(`GET /color-codes/search?articulo=${articulo}`);
+
+    if (!articulo || isNaN(articulo)) {
+      return res.status(400).json({ error: 'Artículo inválido' });
+    }
+
+    const articuloNum = parseInt(articulo, 10);
+
+    if (isPackaged) {
+      try {
+        const result = await queries.searchColorCodes(pool, articuloNum);
+        res.json(result.recordset);
+      } catch (err) {
+        serverLog(`[ERROR] GET /color-codes/search: ${err}`);
+        res.status(500).json({ error: err.message });
+      }
+      // test data
+      serverLog(`Using test data for /color-codes/search`);
+      const testResults = [
+        { Articulo: articuloNum, Color: 1, Code: '001', ColorDesc: 'Negro', Hex: '#272727', WhiteText: true, Talle: 'M', StyleCode: '9017-M-BK' },
+        { Articulo: articuloNum, Color: 2, Code: '002', ColorDesc: 'Azul Marino', Hex: '#083D77', WhiteText: true, Talle: 'L', StyleCode: '9017-L-NV' },
+        { Articulo: articuloNum + 0.1, Color: 1, Code: '001', ColorDesc: 'Negro', Hex: '#272727', WhiteText: true, Talle: 'S', StyleCode: '9017-S-BK' },
+        { Articulo: articuloNum + 0.2, Color: 3, Code: '003', ColorDesc: 'Blanco', Hex: '#FFFFFF', WhiteText: false, Talle: 'XL', StyleCode: '9017-XL-WT' },
+      ];
+      res.json(testResults);
+    }
+  });
+
+  app.get('/color-codes/colores', async (req, res) => {
+    serverLog('GET /color-codes/colores');
+
+    if (isPackaged) {
+      try {
+        const result = await queries.getAppColores(pool);
+        res.json(result.recordset);
+      } catch (err) {
+        serverLog(`[ERROR] GET /color-codes/colores: ${err}`);
+        res.status(500).json({ error: err.message });
+      }
+    } else {
+      // test data
+      serverLog('Using test data for /color-codes/colores');
+      const testColores = [
+        { Id: 1, Color: 'CRUDO GRIS', Hex: '#BEB1B0', WhiteText: false },
+        { Id: 2, Color: 'CRUDO NEGRO', Hex: '#272727', WhiteText: true },
+        { Id: 5, Color: 'NEGRO', Hex: '#272727', WhiteText: true },
+        { Id: 32, Color: 'GRIS MARINO', Hex: '#BEB1B0', WhiteText: false },
+        { Id: 33, Color: 'GRIS MOSTAZA', Hex: '#FDD49B', WhiteText: false },
+        { Id: 38, Color: 'GRIS BORDÓ', Hex: '#581845', WhiteText: true },
+        { Id: 39, Color: 'GRIS GRIS', Hex: '#BEB1B0', WhiteText: false },
+        { Id: 52, Color: 'GRIS NEGRO', Hex: '#272727', WhiteText: true },
+        { Id: 53, Color: 'PETRÓLEO', Hex: '#083D77', WhiteText: true },
+        { Id: 86, Color: 'VERDE', Hex: '#2E7D32', WhiteText: true },
+      ];
+      res.json(testColores);
+    }
+  });
+
+  app.post('/color-codes/update-style', async (req, res) => {
+    const { articulo, color, talle, styleCode } = req.body;
+    serverLog(`POST /color-codes/update-style - Articulo: ${articulo}, Color: ${color}, Talle: ${talle}, StyleCode: ${styleCode}`);
+
+    if (articulo === undefined || color === undefined || talle === undefined || styleCode === undefined) {
+      return res.status(400).json({ error: 'Faltan parámetros requeridos' });
+    }
+
+    if (isPackaged) {
+      try {
+        await queries.updateStyleCode(pool, Number(articulo), Number(color), Number(talle), styleCode);
+        res.json({ success: true });
+      } catch (err) {
+        serverLog(`[ERROR] POST /color-codes/update-style: ${err}`);
+        res.status(500).json({ error: err.message });
+      }
+    } else {
+      // test data
+      serverLog('Using mock response for /color-codes/update-style');
+      res.json({ success: true });
+    }
+  });
+
+  app.get('/color-codes/log', async (req, res) => {
+    serverLog('GET /color-codes/log');
+
+    if (isPackaged) {
+      try {
+        const result = await queries.getColorCodesLog(pool);
+        res.json(result.recordset);
+      } catch (err) {
+        serverLog(`[ERROR] GET /color-codes/log: ${err}`);
+        res.status(500).json({ error: err.message });
+      }
+    } else {
+      // test data
+      serverLog('Using test data for /color-codes/log');
+      const testLog = [
+        { Articulo: 12050, Talle: 1, Code: 'CG', ColorID: 1, Color: 'CRUDO GRIS', Hex: '#BEB1B0', WhiteText: false, StyleCode: '120501CG', FechaVinculacion: new Date('2026-06-23T10:30:00') },
+        { Articulo: 12050.45, Talle: 1, Code: 'AG', ColorID: 32, Color: 'GRIS MARINO', Hex: '#3173AF', WhiteText: true, StyleCode: '120501AG', FechaVinculacion: new Date('2026-06-23T11:45:00') },
+        { Articulo: 12050.45, Talle: 2, Code: 'NG', ColorID: 52, Color: 'GRIS NEGRO', Hex: '#272727', WhiteText: true, StyleCode: '120502NG', FechaVinculacion: new Date('2026-06-23T12:15:00') },
+        { Articulo: 12050.45, Talle: 2, Code: 'PN', ColorID: 53, Color: 'PETRÓLEO', Hex: '#083D77', WhiteText: true, StyleCode: '120502PN', FechaVinculacion: new Date('2026-06-23T13:00:00') },
+      ];
+      res.json(testLog);
+    }
+  });
+
+  app.post('/color-codes/update-color', async (req, res) => {
+    const { id, hex, whiteText } = req.body;
+    serverLog(`POST /color-codes/update-color - Id: ${id}, Hex: ${hex}, WhiteText: ${whiteText}`);
+
+    if (id === undefined || !hex) {
+      return res.status(400).json({ error: 'Faltan parámetros requeridos' });
+    }
+
+    if (isPackaged) {
+      try {
+        await queries.updateColor(pool, Number(id), hex, !!whiteText);
+        res.json({ success: true });
+      } catch (err) {
+        serverLog(`[ERROR] POST /color-codes/update-color: ${err}`);
+        res.status(500).json({ error: err.message });
+      }
+    } else {
+      // test data
+      serverLog('Using mock response for /color-codes/update-color');
+      res.json({ success: true });
+    }
+  });
+
+  app.get('/disponibles', async (req, res) => {
+    serverLog('GET /disponibles');
+    const { room } = req.query;
+
+    if (isPackaged) {
+      try {
+        const machinesResult = await queries.getDisponiblesMachines(pool, room);
+        const rawMachines = machinesResult.recordset;
+
+        // Parse each machine's StyleCode so we can match vs programada
+        await Promise.all(
+          rawMachines.map(async (m) => {
+            const parsed = await parseStyleCode(pool, m.RoomCode.trim(), m.StyleCodeRaw.trim());
+            m.StyleCode = parsed;
+          })
+        );
+
+        res.json(rawMachines);
+      } catch (err) {
+        serverLog(`[ERROR] GET /disponibles: ${err}`);
+        res.status(500).json({ error: err.message });
+      }
+    } else {
+      // test data: reuse offline test data shape so dev mode still works
+      serverLog('Using test data for /disponibles');
+      res.json([]);
+    }
+  });
+
+  app.get('/grupos', async (req, res) => {
+    serverLog('GET /grupos');
+
+    if (isPackaged) {
+      try {
+        const machinesResult = await queries.getGruposMachines(pool);
+        const targetsResult = await queries.getGruposTargets(pool);
+
+        const machines = machinesResult.recordset;
+        const targets = targetsResult.recordset;
+
+        // Build targetMet map by style code (trimmed)
+        const targetsMap = {};
+        targets.forEach(row => {
+          const style = (row.StyleCode || '').trim();
+          const target = row.TargetPieces || 0;
+          const total = row.TotalPieces || 0;
+          targetsMap[style] = total >= target;
+        });
+
+        // Group machines by StyleCode (split first part and trimmed)
+        const groups = {};
+        machines.forEach(row => {
+          const rawStyle = (row.StyleCode || '').trim();
+          if (!rawStyle || rawStyle === '01') return;
+
+          // Split style by space and take first part
+          const style = rawStyle.split(/\s+/)[0].trim();
+          const machCode = row.MachCode;
+          const targetOrder = row.TargetOrder || 0;
+          let room = (row.RoomCode || '').trim().toUpperCase();
+          if (room === 'HOMBRE') room = 'ALGODÓN';
+
+          if (!groups[style]) {
+            groups[style] = {
+              style: style,
+              maquinas: [],
+              room: room,
+              targets: []
+            };
+          }
+          groups[style].maquinas.push(machCode);
+          groups[style].targets.push(targetOrder);
+        });
+
+        // Convert groups to array list
+        const list = Object.values(groups).map(g => {
+          let targetMet = false;
+          Object.keys(targetsMap).forEach(k => {
+            if (k.startsWith(g.style)) {
+              if (targetsMap[k]) {
+                targetMet = true;
+              }
+            }
+          });
+
+          const allTargetsZero = g.targets.length > 0 && g.targets.every(t => t === 0);
+
+          return {
+            style: g.style,
+            room: g.room,
+            maquinas: g.maquinas.sort((a, b) => a - b),
+            targetMet: targetMet,
+            allTargetsZero: allTargetsZero
+          };
+        });
+
+        res.json(list);
+      } catch (err) {
+        serverLog(`[ERROR] GET /grupos: ${err}`);
+        res.status(500).json({ error: err.message });
+      }
+    } else {
+      // test data
+      serverLog('Using test data for /grupos');
+      res.json(testData.grupos);
+    }
+  });
+
+  app.get('/distribucion', async (req, res) => {
+    serverLog('GET /distribucion');
+
+    if (isPackaged) {
+      try {
+        const result = await queries.getDistribucionColores(pool);
+        const list = result.recordset;
+
+        // Merge with equivalencias.json
+        const equivalencias = getEquivalencias();
+
+        const data = list.map(row => {
+          const artStr = String(row.Articulo).trim();
+          const colorStr = String(row.ColorBase).trim();
+          
+          let destinos = [];
+          
+          const matchKey = Object.keys(equivalencias).find(
+            k => String(k).trim() === artStr || Number(k) === Number(artStr)
+          );
+
+          if (matchKey && equivalencias[matchKey][colorStr]) {
+            destinos = equivalencias[matchKey][colorStr];
+          }
+
+          return {
+            Articulo: row.Articulo,
+            ColorBase: row.ColorBase,
+            Hex: row.Hex,
+            WhiteText: row.WhiteText,
+            TeñirA: destinos.join(', ')
+          };
+        });
+
+        res.json(data);
+      } catch (err) {
+        serverLog(`[ERROR] GET /distribucion: ${err}`);
+        res.status(500).json({ error: err.message });
+      }
+    } else {
+      serverLog('Using test data for /distribucion');
+      res.json(testData.distribucion);
+    }
+  });
+
+  app.get('/produccion/maquinas', async (req, res) => {
+    serverLog('GET /produccion/maquinas');
+
+    const { maquinas } = req.query;
+    if (!maquinas) {
+      return res.json([]);
+    }
+
+    const machineList = maquinas.split(',')
+      .map(m => m.trim())
+      .filter(m => m !== '')
+      .map(m => parseInt(m, 10))
+      .filter(m => !isNaN(m));
+
+    if (machineList.length === 0) {
+      return res.json([]);
+    }
+
+    if (isPackaged) {
+      try {
+        const [prodResult, defResult] = await Promise.all([
+          queries.getMachineProduction(pool, machineList),
+          queries.getMachineDefects(pool, machineList)
+        ]);
+
+        const prodRows = prodResult.recordset;
+        const defRows = defResult.recordset;
+
+        const dias = {};
+
+        prodRows.forEach(row => {
+          const dt = row.DateRec;
+          if (!dt) return;
+
+          const { date, turno } = obtenerDiaYTurno(dt);
+
+          if (!dias[date]) {
+            dias[date] = {
+              dateStr: dayjs(date).format('DD/MM/YYYY'),
+              turnos: {
+                1: { piezas: 0, saldo: 0, maquinas: {}, maquinasSaldo: {} },
+                2: { piezas: 0, saldo: 0, maquinas: {}, maquinasSaldo: {} },
+                3: { piezas: 0, saldo: 0, maquinas: {}, maquinasSaldo: {} },
+              }
+            };
+          }
+
+          const piezas = row.Pieces || 0;
+          if (piezas <= 0) return;
+
+          dias[date].turnos[turno].piezas += piezas;
+
+          const maquina = row.MachCode;
+          const estilo = (row.StyleCode || '—').substring(0, 9).trim();
+
+          if (!dias[date].turnos[turno].maquinas[maquina]) {
+            dias[date].turnos[turno].maquinas[maquina] = {};
+          }
+
+          if (!dias[date].turnos[turno].maquinas[maquina][estilo]) {
+            dias[date].turnos[turno].maquinas[maquina][estilo] = 0;
+          }
+
+          dias[date].turnos[turno].maquinas[maquina][estilo] += piezas;
+        });
+
+        defRows.forEach(row => {
+          const dt = row.DateRec;
+          if (!dt) return;
+
+          const { date, turno } = obtenerDiaYTurno(dt);
+
+          if (dias[date] && dias[date].turnos[turno]) {
+            dias[date].turnos[turno].saldo += (row.Times || 0);
+
+            const maquina = row.MachCode;
+            if (maquina) {
+              if (!dias[date].turnos[turno].maquinasSaldo[maquina]) {
+                dias[date].turnos[turno].maquinasSaldo[maquina] = 0;
+              }
+              dias[date].turnos[turno].maquinasSaldo[maquina] += (row.Times || 0);
+            }
+          }
+        });
+
+        const divisor = machineList.every(m => m >= 1001) ? 12 : 24;
+
+        const responseData = Object.keys(dias).sort((a, b) => b.localeCompare(a)).map(dateKey => {
+          const dayObj = dias[dateKey];
+          
+          let totalDayPiezas = 0;
+          let totalDaySaldo = 0;
+
+          const turnosArray = [1, 2, 3].map(tNum => {
+            const turnoObj = dayObj.turnos[tNum];
+            totalDayPiezas += turnoObj.piezas;
+            totalDaySaldo += turnoObj.saldo;
+
+            const maquinasArray = Object.keys(turnoObj.maquinas).sort().map(mCode => {
+              const machineEstilos = turnoObj.maquinas[mCode];
+              let totalMachPiezas = 0;
+
+              const estilosArray = Object.keys(machineEstilos).sort().map(eName => {
+                const ePiezas = machineEstilos[eName];
+                totalMachPiezas += ePiezas;
+
+                return {
+                  id: `${dateKey}-${tNum}-${mCode}-${eName}`,
+                  name: eName,
+                  piezas: ePiezas,
+                  docenas: parseFloat((ePiezas / divisor).toFixed(2))
+                };
+              });
+
+              const machSaldo = turnoObj.maquinasSaldo[mCode] || 0;
+
+              return {
+                id: `${dateKey}-${tNum}-${mCode}`,
+                name: `Máquina ${mCode}`,
+                piezas: totalMachPiezas,
+                docenas: parseFloat((totalMachPiezas / divisor).toFixed(2)),
+                saldo: machSaldo,
+                articulos: estilosArray
+              };
+            });
+
+            return {
+              id: `${dateKey}-${tNum}`,
+              name: `Turno ${tNum}`,
+              piezas: turnoObj.piezas,
+              docenas: parseFloat((turnoObj.piezas / divisor).toFixed(2)),
+              saldo: turnoObj.saldo,
+              maquinas: maquinasArray
+            };
+          });
+
+          return {
+            id: dateKey,
+            fecha: dayObj.dateStr,
+            piezas: totalDayPiezas,
+            docenas: parseFloat((totalDayPiezas / divisor).toFixed(2)),
+            saldo: totalDaySaldo,
+            turnos: turnosArray
+          };
+        });
+
+        res.json(responseData);
+      } catch (err) {
+        serverLog(`[ERROR] GET /produccion/maquinas: ${err}`);
+        res.status(500).json({ error: err.message });
+      }
+    } else {
+      serverLog('Using test data for /produccion/maquinas');
+      res.json(testData.produccionMaquinas);
+    }
+  });
+
   app.get('/:room/programada', async (req, res) => {
+
+
     const { room } = req.params;
     serverLog(`GET /${room}/programada`);
 
@@ -720,6 +1318,50 @@ const startServer = () => {
     } else {
       // test data
       serverLog(`Test for /${room}/programada/insertStartDate`);
+    }
+  });
+
+  app.get('/programada/history', async (req, res) => {
+    const { mes, anio, roomCode, articulo } = req.query;
+    serverLog(`GET /programada/history - mes: ${mes}, anio: ${anio}, roomCode: ${roomCode}, articulo: ${articulo}`);
+
+    if (isPackaged) {
+      try {
+        const result = await queries.getProgramadaHistory(
+          pool,
+          Number(mes),
+          Number(anio),
+          roomCode,
+          articulo
+        );
+        res.json(result.recordset);
+      } catch (err) {
+        serverLog(`[ERROR] GET /programada/history: ${err}`);
+        res.status(500).json({ error: err.message });
+      }
+    } else {
+      serverLog(`Using test data for GET /programada/history`);
+      const mockHistory = [
+        {
+          Fecha: new Date().toISOString(),
+          Articulo: 6428,
+          Talle: 3,
+          RoomCode: roomCode === 'HOMBRE' ? 'ALGODÓN' : roomCode,
+          Docenas: 50,
+          'Docenas prev.': 40,
+          'Estado articulo': 'Modificado'
+        },
+        {
+          Fecha: new Date().toISOString(),
+          Articulo: 1234,
+          Talle: 2,
+          RoomCode: roomCode === 'HOMBRE' ? 'ALGODÓN' : roomCode,
+          Docenas: 100,
+          'Docenas prev.': null,
+          'Estado articulo': 'Agregado'
+        }
+      ];
+      res.json(mockHistory);
     }
   });
 

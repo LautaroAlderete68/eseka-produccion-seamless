@@ -7,6 +7,12 @@ import EnhancedFooter from './EnhancedFooter.jsx';
 import TableSkeleton from './TableSkeleton.jsx';
 import { useLocation } from 'react-router';
 
+const getHeaderTopOffset = (str) => {
+  if (!str) return '0px';
+  const match = str.match(/top-\[(\d+px)\]/);
+  return match ? match[1] : '0px';
+};
+
 /**
  * SortedSelectedTable
  * Renders a table with sortable columns and selectable rows.
@@ -24,14 +30,63 @@ export default function EnhancedTable({
   headerTop = '',
   checkboxVariant = 'outlined',
   uniqueIds = ['Articulo', 'Talle', 'ColorId'],
+  selected: selectedProp,
+  setSelected: setSelectedProp,
+  storageKey: storageKeyProp,
 }) {
   const location = useLocation();
+  const storageKey = storageKeyProp || location.pathname;
   // State for current sort order ('asc' or 'desc')
-  const [order, setOrder] = useState(initOrder);
+  const [order, setOrder] = useState(() => {
+    const saved = localStorage.getItem(storageKey);
+    if (saved) {
+      try {
+        const parsed = JSON.parse(saved);
+        if (parsed.order) return parsed.order;
+      } catch (e) {}
+    }
+    return initOrder;
+  });
   // State for current column to sort by
-  const [orderBy, setOrderBy] = useState(initOrderBy);
-  // State for currently selected rows
-  const [selected, setSelected] = useState([]);
+  const [orderBy, setOrderBy] = useState(() => {
+    const saved = localStorage.getItem(storageKey);
+    if (saved) {
+      try {
+        const parsed = JSON.parse(saved);
+        if (parsed.orderBy) return parsed.orderBy;
+      } catch (e) {}
+    }
+    return initOrderBy;
+  });
+
+  const [prevStorageKey, setPrevStorageKey] = useState(storageKey);
+  if (storageKey !== prevStorageKey) {
+    setPrevStorageKey(storageKey);
+    const saved = localStorage.getItem(storageKey);
+    if (saved) {
+      try {
+        const parsed = JSON.parse(saved);
+        if (parsed.order && parsed.orderBy) {
+          setOrder(parsed.order);
+          setOrderBy(parsed.orderBy);
+        } else {
+          setOrder(initOrder);
+          setOrderBy(initOrderBy);
+        }
+      } catch (e) {
+        setOrder(initOrder);
+        setOrderBy(initOrderBy);
+      }
+    } else {
+      setOrder(initOrder);
+      setOrderBy(initOrderBy);
+    }
+  }
+  
+  // State for currently selected rows (either passed as prop or local)
+  const [localSelected, setLocalSelected] = useState([]);
+  const selected = selectedProp !== undefined ? selectedProp : localSelected;
+  const setSelected = setSelectedProp !== undefined ? setSelectedProp : setLocalSelected;
   // State for currently opened rows
   const [opened, setOpened] = useState(null);
   // loading state
@@ -41,27 +96,15 @@ export default function EnhancedTable({
 
   const uniqueId = (row) => uniqueIds.map((id) => row[id]).join('-');
 
-  // Load saved sort on mount
-  useEffect(() => {
-    const saved = localStorage.getItem(location.pathname);
-    if (saved) {
-      const { order, orderBy } = JSON.parse(saved);
-      if (order && orderBy) {
-        setOrder(order);
-        setOrderBy(orderBy);
-      }
-    }
-  }, [location.pathname]);
-
   // Save sort on change
   useEffect(() => {
     if (orderBy) {
       localStorage.setItem(
-        location.pathname,
+        storageKey,
         JSON.stringify({ order, orderBy })
       );
     }
-  }, [order, orderBy, location.pathname]);
+  }, [order, orderBy, storageKey]);
 
   const [sortedRows, sortedPdfRows] = useMemo(() => {
     return [
@@ -132,12 +175,16 @@ export default function EnhancedTable({
       stripe={stripe}
       variant='outlined'
       hoverRow
+      stickyHeader
       className={`rounded-md ${className}`}
       sx={{
         '--TableCell-selectedBackground': (theme) =>
           theme.vars.palette.primary.softHoverBg,
         '--TableRow-stripeBackground': (theme) =>
           theme.vars.palette.background.level1,
+        '& th': {
+          top: getHeaderTopOffset(headerTop),
+        }
       }}
     >
       {/* Table header with sorting and select-all functionality */}

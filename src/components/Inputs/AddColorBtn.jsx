@@ -1,6 +1,6 @@
-import AddRounded from '@mui/icons-material/AddRounded';
-import Check from '@mui/icons-material/Check';
-import Close from '@mui/icons-material/Close';
+import AddOutlined from '@mui/icons-material/AddOutlined';
+import CheckOutlined from '@mui/icons-material/CheckOutlined';
+import CloseOutlined from '@mui/icons-material/CloseOutlined';
 import Button from '@mui/joy/Button';
 import FormControl from '@mui/joy/FormControl';
 import Input from '@mui/joy/Input';
@@ -71,7 +71,7 @@ export default function AddColorBtn({
             className='w-44'
             disabled={!editing && value !== ''}
           >
-            <AddRounded />
+            <AddOutlined />
             &nbsp;Agregar color
           </Button>
         ) : (
@@ -93,11 +93,11 @@ export default function AddColorBtn({
                 setValue('');
               }}
             >
-              <Close />
+              <CloseOutlined />
             </Button>
 
             <Button onClick={handleSubmit}>
-              <Check />
+              <CheckOutlined />
             </Button>
           </form>
         )}

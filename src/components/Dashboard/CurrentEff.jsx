@@ -15,6 +15,11 @@ export default function CurrentEff({ yesterdayEff }) {
   const { room } = useOutletContext();
   const [loading, setLoading] = useState(true);
   const [dataset, setDataset] = useState({ total: 0, groups: [] });
+  const [prevRoom, setPrevRoom] = useState(room);
+  if (room !== prevRoom) {
+    setPrevRoom(room);
+    setLoading(true);
+  }
 
   useEffect(() => {
     let ignored = false;
@@ -42,7 +47,7 @@ export default function CurrentEff({ yesterdayEff }) {
           console.error('[CLIENT] Error fetching /stats/currentEff:', err)
         );
     }
-  }, []);
+  }, [apiUrl, room]);
 
   return (
     <ChartContent loading={loading} direction='row' gap={8}>

@@ -30,6 +30,12 @@ import CssBaseline from '@mui/joy/CssBaseline';
 import Dashboard from './containers/Dashboard.jsx';
 import { getChartsCustomizations } from './theme/charts.js';
 import Cambios from './containers/Cambios.jsx';
+import Offline from './containers/Offline.jsx';
+import Distribucion from './containers/Distribucion.jsx';
+import ProduccionMaquinas from './containers/ProduccionMaquinas.jsx';
+import Disponibles from './containers/Disponibles.jsx';
+import CodigosColor from './containers/CodigosColor.jsx';
+
 
 dayjs.extend(utc);
 dayjs.extend(timezone);
@@ -58,6 +64,30 @@ function AppProviders({ children }) {
   });
 
   joyTheme = extendTheme({
+    colorSchemes: {
+      light: {
+        palette: {
+          background: {
+            body: '#f4f6f8',
+          },
+        },
+      },
+      dark: {
+        palette: {
+          background: {
+            body: '#0d1117', // GitHub dark mode main background
+            surface: '#161b22', // GitHub dark mode card background
+            level1: '#21262d', // GitHub dark background level 1 (sidebar etc)
+            level2: '#30363d', // GitHub dark background level 2
+          },
+          text: {
+            primary: '#c9d1d9', // GitHub dark text primary
+            secondary: '#8b949e', // GitHub dark text secondary
+          },
+          divider: '#30363d', // GitHub dark mode border color
+        },
+      },
+    },
     components: {
       // The component identifier always start with `Joy${ComponentName}`.
       JoyCheckbox: {
@@ -106,6 +136,11 @@ export default function App() {
           <Route path='maquinas' element={<Maquinas />} />
           <Route path='cambios' element={<Cambios />} />
           <Route path='produccion' element={<Produccion />} />
+          <Route path='offline' element={<Offline />} />
+          <Route path='distribucion' element={<Distribucion />} />
+          <Route path='produccion-maquinas' element={<ProduccionMaquinas />} />
+          <Route path='disponibles' element={<Disponibles />} />
+          <Route path='codigos-color' element={<CodigosColor />} />
         </Route>
       </Routes>
     </HashRouter>

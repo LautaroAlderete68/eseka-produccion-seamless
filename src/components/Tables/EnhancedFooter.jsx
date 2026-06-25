@@ -1,4 +1,4 @@
-import PrintRounded from '@mui/icons-material/PrintRounded';
+import PrintOutlined from '@mui/icons-material/PrintOutlined';
 import IconButton from '@mui/joy/IconButton';
 import { useConfig } from '../../ConfigContext.jsx';
 import { useLocation, useOutletContext } from 'react-router';
@@ -152,7 +152,7 @@ export default function EnhancedFooter({
               variant='soft'
               onClick={handlePDFExport}
             >
-              <PrintRounded className='text-(--joy-palette-primary-500)' />
+              <PrintOutlined className='text-(--joy-palette-primary-500)' />
             </IconButton>
           )}
         </td>

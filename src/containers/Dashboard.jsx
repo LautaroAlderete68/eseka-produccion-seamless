@@ -1,5 +1,7 @@
 import Box from '@mui/joy/Box';
 import Card from '@mui/joy/Card';
+import Stack from '@mui/joy/Stack';
+import Typography from '@mui/joy/Typography';
 import DailyProduction from '../components/Dashboard/DailyProduction.jsx';
 import TotalProduced from '../components/Dashboard/TotalProduced.jsx';
 import { useEffect, useMemo, useState } from 'react';
@@ -13,18 +15,190 @@ import isSameOrBefore from 'dayjs/plugin/isSameOrBefore';
 import DateEstimate from '../components/Dashboard/DateEstimate.jsx';
 import RequiredProd from '../components/Dashboard/RequiredProd.jsx';
 import { useOutletContext } from 'react-router';
+import { calcAProducir, calcProducido } from '../utils/progTableUtils.js';
+import localizedNum from '../utils/numFormat.js';
 
 dayjs.extend(isSameOrBefore);
 
-let apiUrl;
+function PowerBiGauge({ title, value, target, unit = "Docenas", loading }) {
+  const pct = target > 0 ? Math.min(100, (value / target) * 100) : 0;
+  const remaining = target > value ? target - value : 0;
+
+  const r = 80;
+  const strokeWidth = 14;
+  const circumference = Math.PI * r; // 251.32
+  const strokeDashoffset = circumference - (pct / 100) * circumference;
+
+  if (loading) {
+    return (
+      <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '100%', py: 2 }}>
+        <Typography level="title-md" sx={{ color: 'text.primary' }}>{title}</Typography>
+        <Typography level="body-md" sx={{ mt: 2, fontStyle: 'italic', color: 'text.secondary' }}>Cargando medidor...</Typography>
+      </Box>
+    );
+  }
+
+  return (
+    <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', width: '100%', height: '100%', p: 1 }}>
+      <Typography level="title-lg" sx={{ fontWeight: 'bold', mb: 1, color: 'text.primary' }}>
+        {title}
+      </Typography>
+      
+      <Box sx={{ position: 'relative', width: 300, height: 180 }}>
+        <svg width="300" height="180" viewBox="0 0 200 120">
+          {/* Background Arc */}
+          <path
+            d="M 20 100 A 80 80 0 0 1 180 100"
+            fill="none"
+            stroke="var(--joy-palette-neutral-200)"
+            strokeWidth={strokeWidth}
+            strokeLinecap="round"
+          />
+          
+          {/* Progress Arc */}
+          {pct > 0 && (
+            <path
+              d="M 20 100 A 80 80 0 0 1 180 100"
+              fill="none"
+              stroke="var(--joy-palette-primary-500)"
+              strokeWidth={strokeWidth}
+              strokeDasharray={circumference}
+              strokeDashoffset={strokeDashoffset}
+              strokeLinecap="round"
+              style={{ transition: 'stroke-dashoffset 1s ease-in-out' }}
+            />
+          )}
+
+          {/* Min label inside SVG to prevent overlay issues */}
+          <text
+            x="20"
+            y="118"
+            textAnchor="middle"
+            fill="var(--joy-palette-neutral-500)"
+            fontSize="10"
+            fontFamily="Inter, sans-serif"
+            fontWeight="500"
+          >
+            0
+          </text>
+
+          {/* Target label inside SVG to prevent overlay issues */}
+          <text
+            x="180"
+            y="118"
+            textAnchor="end"
+            fill="var(--joy-palette-danger-600)"
+            fontSize="10"
+            fontFamily="Inter, sans-serif"
+            fontWeight="bold"
+          >
+            {localizedNum(Math.round(target || 0))}
+          </text>
+        </svg>
+
+        {/* Value and Percentage Centered at the Bottom */}
+        <Box sx={{
+          position: 'absolute',
+          bottom: 28,
+          left: 0,
+          right: 0,
+          textAlign: 'center',
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center'
+        }}>
+          <Typography level="h2" sx={{ fontWeight: '800', lineHeight: 1, color: 'text.primary' }}>
+            {Math.round(pct)}%
+          </Typography>
+        </Box>
+      </Box>
+
+      {/* Info details */}
+      <Stack direction="row" spacing={3} sx={{ mt: 2, width: '100%', justifyContent: 'center' }}>
+        <Box sx={{ textAlign: 'center' }}>
+          <Typography level="body-xs" color="neutral">Producido</Typography>
+          <Typography level="title-sm" color="primary" sx={{ fontWeight: 'bold' }}>
+            {localizedNum(Math.round(value || 0))} {unit}
+          </Typography>
+        </Box>
+        <Box sx={{ width: '1px', backgroundColor: 'var(--joy-palette-neutral-300)', alignSelf: 'stretch' }} />
+        <Box sx={{ textAlign: 'center' }}>
+          <Typography level="body-xs" color="neutral">Falta</Typography>
+          <Typography level="title-sm" color={remaining > 0 ? "warning" : "success"} sx={{ fontWeight: 'bold' }}>
+            {remaining > 0 ? `${localizedNum(Math.round(remaining))} ${unit}` : '¡Meta cumplida!'}
+          </Typography>
+        </Box>
+      </Stack>
+    </Box>
+  );
+}
+
 export default function Dashboard() {
-  apiUrl = useConfig().apiUrl;
+  const { apiUrl } = useConfig();
   const { room } = useOutletContext();
   const [dailyProd, setDailyProd] = useState([]);
   const [holidays, setHolidays] = useState([]);
   const [progTotal, setProgTotal] = useState(null);
   const [yesterdayEff, setYesterdayEff] = useState({});
   const now = dayjs.tz();
+
+  const [prevRoom, setPrevRoom] = useState(room);
+  if (room !== prevRoom) {
+    setPrevRoom(room);
+    setDailyProd([]);
+    setProgTotal(null);
+  }
+
+  const [seamlessData, setSeamlessData] = useState({ produced: 0, target: 0, loading: true });
+  const [algodonData, setAlgodonData] = useState({ produced: 0, target: 0, loading: true });
+
+  useEffect(() => {
+    let ignore = false;
+
+    const fetchGaugeStats = async (r, setter) => {
+      try {
+        const dateRes = await fetch(`${apiUrl}/${r}/programada/actualDate`);
+        if (!dateRes.ok) throw new Error();
+        const dateData = await dateRes.json();
+        
+        let target = 0;
+        let produced = 0;
+        const now = dayjs.tz();
+        const month = now.month() + 1;
+        const year = now.year();
+
+        if (dateData && dateData.length > 0 && dateData[0].Month === month && dateData[0].Year === year) {
+          const startDate = dateData[0].Date;
+          const params = new URLSearchParams({ startDate, _t: Date.now() }).toString();
+          const progRes = await fetch(`${apiUrl}/${r}/programada?${params}`);
+          if (progRes.ok) {
+            const progData = await progRes.json();
+            const docena = r === 'SEAMLESS' ? 12 : 24;
+            const porcExtra = r === 'SEAMLESS' ? 1.01 : 1.02;
+
+            target = Array.isArray(progData) ? progData.reduce((acc, row) => acc + calcAProducir(row), 0) : 0;
+            produced = Array.isArray(progData) ? progData.reduce((acc, row) => acc + calcProducido(row, docena, porcExtra), 0) : 0;
+          }
+        }
+
+        if (!ignore) {
+          setter({ produced, target, loading: false });
+        }
+      } catch (e) {
+        console.error(`[DASHBOARD GAUGE] Error fetching stats for ${r}:`, e);
+        if (!ignore) {
+          setter(prev => ({ ...prev, loading: false }));
+        }
+      }
+    };
+
+    fetchGaugeStats('SEAMLESS', setSeamlessData);
+    fetchGaugeStats('HOMBRE', setAlgodonData);
+
+    return () => {
+      ignore = true;
+    };
+  }, [apiUrl]);
 
   useEffect(() => {
     let ignore = false;
@@ -99,7 +273,7 @@ export default function Dashboard() {
       ignore = true;
       clearTimeout(timeoutId);
     };
-  }, []);
+  }, [apiUrl, room]);
 
   const totalProduced = useMemo(() => {
     return dailyProd.reduce((acc, row) => acc + row.Docenas, 0);
@@ -128,7 +302,7 @@ export default function Dashboard() {
     progTotal === 0 ? 0 : Math.round((estimate / progTotal) * 100);
 
   return (
-    <Box className='grid w-full h-screen grid-cols-4 gap-4 py-4 auto-rows-fr *:flex-none'>
+    <Box className='grid w-full grid-cols-4 gap-4 py-4 pb-12 *:flex-none'>
       {/* Top */}
       <Card>
         <TotalProduced
@@ -180,12 +354,29 @@ export default function Dashboard() {
         <MonthSaldo />
       </Card>
       {/* Bottom */}
-      <Card className='col-span-4'>
+      <Card className='col-span-3'>
         <DailyProduction
-          dataset={dailyProd}
+          dataset={dailyProd.slice(-10)}
           dailyAverage={dailyAverage}
           loading={dailyProd.length === 0}
         />
+      </Card>
+      <Card className='col-span-1'>
+        {room === 'SEAMLESS' ? (
+          <PowerBiGauge
+            title="Medidor de producción"
+            value={seamlessData.produced}
+            target={seamlessData.target}
+            loading={seamlessData.loading}
+          />
+        ) : (
+          <PowerBiGauge
+            title="Medidor de producción"
+            value={algodonData.produced}
+            target={algodonData.target}
+            loading={algodonData.loading}
+          />
+        )}
       </Card>
     </Box>
   );

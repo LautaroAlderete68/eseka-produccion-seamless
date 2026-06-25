@@ -11,11 +11,11 @@ export const getChartsCustomizations = (theme) => ({
     styleOverrides: {
       root: {
         [`& .${axisClasses.line}`]: {
-          stroke: theme.vars.palette.neutral[300],
+          stroke: theme.vars.palette.divider,
         },
-        [`& .${axisClasses.tick}`]: { stroke: theme.vars.palette.neutral[300] },
+        [`& .${axisClasses.tick}`]: { stroke: theme.vars.palette.divider },
         [`& .${axisClasses.tickLabel}`]: {
-          fill: theme.vars.palette.neutral[500],
+          fill: theme.vars.palette.text.secondary,
           fontWeight: theme.vars.fontWeight.md,
         },
       },
@@ -30,13 +30,46 @@ export const getChartsCustomizations = (theme) => ({
         },
         [`& .${chartsTooltipClasses.table}`]: {
           borderRadius: theme.vars.radius.sm,
-          background: 'hsl(0, 0%, 100%)',
+          background: theme.vars.palette.background.surface,
+          color: theme.vars.palette.text.primary,
+        },
+        [`& .${chartsTooltipClasses.cell}`]: {
+          color: theme.vars.palette.text.primary,
+        },
+        [`& .${chartsTooltipClasses.labelCell}`]: {
+          color: theme.vars.palette.text.secondary,
         },
         [`& .${chartsTooltipClasses.valueCell}`]: {
+          color: theme.vars.palette.text.primary,
           fontWeight: theme.vars.fontWeight.lg,
         },
         [`& .${chartsTooltipClasses.paper}`]: {
-          background: 'hsl(220, 35%, 97%)',
+          background: theme.vars.palette.background.level1,
+          borderColor: theme.vars.palette.divider,
+        },
+      },
+    },
+  },
+  MuiChartsAxisTooltipContent: {
+    styleOverrides: {
+      root: {
+        borderRadius: theme.vars.radius.sm,
+        background: theme.vars.palette.background.surface,
+        borderColor: theme.vars.palette.divider,
+        color: theme.vars.palette.text.primary,
+        [`& .MuiChartsAxisTooltipContent-cell`]: {
+          color: theme.vars.palette.text.primary,
+        },
+        [`& .MuiChartsAxisTooltipContent-labelCell`]: {
+          color: theme.vars.palette.text.secondary,
+        },
+        [`& .MuiChartsAxisTooltipContent-valueCell`]: {
+          color: theme.vars.palette.text.primary,
+          fontWeight: theme.vars.fontWeight.lg,
+        },
+        [`& .MuiChartsAxisTooltipContent-axisValueCell`]: {
+          color: theme.vars.palette.text.primary,
+          fontWeight: theme.vars.fontWeight.lg,
         },
       },
     },
@@ -47,6 +80,9 @@ export const getChartsCustomizations = (theme) => ({
         [`& .${legendClasses.mark}`]: {
           ry: 6,
         },
+        [`& .${legendClasses.label}`]: {
+          fill: theme.vars.palette.text.primary,
+        },
       },
     },
   },
@@ -54,7 +90,7 @@ export const getChartsCustomizations = (theme) => ({
     styleOverrides: {
       root: {
         [`& .${chartsGridClasses.line}`]: {
-          stroke: theme.vars.palette.neutral[200],
+          stroke: theme.vars.palette.divider,
           strokeDasharray: '4 2',
           strokeWidth: 0.8,
         },

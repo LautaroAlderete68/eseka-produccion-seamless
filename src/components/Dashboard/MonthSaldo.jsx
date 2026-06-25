@@ -18,6 +18,13 @@ export default function MonthSaldo() {
   // for saldo width, since it's so small
   const saldoWidth = 20;
 
+  const [prevRoom, setPrevRoom] = useState(room);
+  if (room !== prevRoom) {
+    setPrevRoom(room);
+    setLoading(true);
+    setDataset({ porc: '0', data: [] });
+  }
+
   useEffect(() => {
     let ignored = false;
 
@@ -36,7 +43,7 @@ export default function MonthSaldo() {
     return () => {
       ignored = true;
     };
-  }, []);
+  }, [apiUrl, room]);
 
   return (
     <BigNumContent

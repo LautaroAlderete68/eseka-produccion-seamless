@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import FilterAltOffRounded from '@mui/icons-material/FilterAltOffRounded';
+import FilterAltOffOutlined from '@mui/icons-material/FilterAltOffOutlined';
 import MachInput from '../Inputs/MachInput.jsx';
 import Stack from '@mui/joy/Stack';
 import FormControl from '@mui/joy/FormControl';
@@ -67,7 +67,7 @@ export default function MachSearchForm({ machines, setFilteredMachines }) {
             (val) => val === undefined || val === ''
           )}
         >
-          <FilterAltOffRounded />
+          <FilterAltOffOutlined />
         </IconButton>
       </Stack>
     </form>

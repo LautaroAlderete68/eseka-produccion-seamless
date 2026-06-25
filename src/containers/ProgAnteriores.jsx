@@ -21,6 +21,15 @@ export default function ProgAnteriores() {
   const [progColor, setProgColor] = useState([]);
   const [filteredProgColor, setFilteredProgColor] = useState([]);
 
+  const [prevRoom, setPrevRoom] = useState(room);
+  if (room !== prevRoom) {
+    setPrevRoom(room);
+    setDates([]);
+    setSelectedDate(undefined);
+    setProgColor([]);
+    setFilteredProgColor([]);
+  }
+
   useEffect(() => {
     let ignore = false;
     fetch(`${apiUrl}/${room}/programada/loadDates`)
@@ -44,7 +53,7 @@ export default function ProgAnteriores() {
     return () => {
       ignore = true;
     };
-  }, []);
+  }, [room]);
 
   function handleChange(val) {
     if (!val) return;
@@ -78,7 +87,7 @@ export default function ProgAnteriores() {
         direction='row'
         className='items-end justify-between top-0 bg-[var(--joy-palette-background-body)] sticky z-10 py-4'
       >
-        <FormControl className='min-w-48'>
+        <FormControl className='min-w-48' key={room}>
           <FormLabel>Fecha</FormLabel>
           <Select
             placeholder='Seleccione...'
@@ -103,6 +112,7 @@ export default function ProgAnteriores() {
 
         {selectedDate && (
           <ProgSearchForm
+            key={`${room}-${selectedDate}`}
             progColor={progColor}
             filteredProgColor={filteredProgColor}
             setFilteredProgColor={setFilteredProgColor}

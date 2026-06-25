@@ -1,8 +1,8 @@
-import KeyboardArrowDownRounded from '@mui/icons-material/KeyboardArrowDownRounded';
+import KeyboardArrowDownOutlined from '@mui/icons-material/KeyboardArrowDownOutlined';
 
 export default function ExpandRowBtn({ isOpen, handleClick, ...props }) {
   return (
-    <KeyboardArrowDownRounded
+    <KeyboardArrowDownOutlined
       onClick={handleClick}
       sx={{
         transition: 'transform 0.2s',

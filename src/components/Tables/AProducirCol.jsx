@@ -1,8 +1,8 @@
 import { useContext, useEffect, useRef, useState } from 'react';
 import { useConfig } from '../../ConfigContext.jsx';
-import Check from '@mui/icons-material/Check';
-import Close from '@mui/icons-material/Close';
-import Edit from '@mui/icons-material/Edit';
+import CheckOutlined from '@mui/icons-material/CheckOutlined';
+import CloseOutlined from '@mui/icons-material/CloseOutlined';
+import EditOutlined from '@mui/icons-material/EditOutlined';
 import Button from '@mui/joy/Button';
 import Input from '@mui/joy/Input';
 import Typography from '@mui/joy/Typography';
@@ -89,7 +89,7 @@ export default function AProducirCol({
     <span>
       {(() => {
         if (!row.Docenas && row.Docenas !== 0) {
-          return live && <Edit onClick={() => setEditProducir(true)} />;
+          return live && <EditOutlined onClick={() => setEditProducir(true)} />;
         } else {
           return (
             <Typography
@@ -97,7 +97,7 @@ export default function AProducirCol({
               startDecorator={
                 live &&
                 row.Porcentaje === null && (
-                  <Edit
+                  <EditOutlined
                     className='invisible group-hover/prod:visible'
                     onClick={() => setEditProducir(true)}
                   />
@@ -122,10 +122,10 @@ export default function AProducirCol({
         required
       />
       <Button color='danger' onClick={() => setEditProducir(false)}>
-        <Close />
+        <CloseOutlined />
       </Button>
       <Button type='submit' onKeyDown={(e) => handleKeyDown(e)}>
-        <Check />
+        <CheckOutlined />
       </Button>
     </form>
   );

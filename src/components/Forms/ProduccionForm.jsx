@@ -7,7 +7,7 @@ import dayjs from 'dayjs';
 import { useConfig } from '../../ConfigContext.jsx';
 import ArtTalleColorInputs from '../Inputs/ArtTalleColorInputs.jsx';
 import { StyledDateTimePicker } from '../Inputs/StyledPickers.jsx';
-import SearchRounded from '@mui/icons-material/SearchRounded';
+import SearchOutlined from '@mui/icons-material/SearchOutlined';
 
 let apiUrl, sqlDateFormat;
 
@@ -135,7 +135,7 @@ export default function ProduccionForm({ formData, setFormData, setUrl }) {
           setFormData={setFormData}
           btnProps={{
             type: 'submit',
-            icon: <SearchRounded />,
+            icon: <SearchOutlined />,
             onKeyDown: (e) => handleKeyDown(e),
             color: 'primary',
             variant: 'solid',
