@@ -43,21 +43,21 @@
 }
 
 :root {
-  /* Light mode colors (original palette) */
-  --done-bg: #ff8c94; /* Vibrant soft coral/red for complete */
-  --almost-done-bg: #ffb3ba; /* Vibrant soft pink for almost done */
-  --todo-bg: #a1e37b; /* Vibrant soft lime/green for todo */
-  --making-bg: #93c5fd; /* Vibrant soft blue for making */
-  --incomplete-bg: #e2dbdb; /* Vibrant soft warm gray for incomplete */
-  --dark-accent-border: #e2e8f0; /* Softer gray than solid black for light mode */
-  --row-hover-bg: #e2f1fc; /* Softer light blue hover */
+  /* Light mode colors (GitHub desaturated professional style) */
+  --done-bg: #ffebe9; /* Soft desaturated coral/red for complete */
+  --almost-done-bg: #fcf0f2; /* Soft desaturated rose/pink for almost done */
+  --todo-bg: #dafbe1; /* Soft desaturated green for todo */
+  --making-bg: #ddf4ff; /* Soft desaturated blue for making */
+  --incomplete-bg: #f6f8fa; /* Soft desaturated gray for incomplete */
+  --dark-accent-border: #d0d7de; /* GitHub light border gray */
+  --row-hover-bg: #f3f4f6; /* Softer light gray hover */
 
-  --todo-bg-pulse: #c2f0ab;
-  --making-bg-pulse: #c3e0fc;
-  --done-bg-pulse: #ffb3b9;
-  --almost-done-bg-pulse: #ffdbe0;
-  --incomplete-bg-pulse: #eee9e9;
-  --default-bg-pulse: #e2e8f0;
+  --todo-bg-pulse: #cbf9d7;
+  --making-bg-pulse: #cdeeff;
+  --done-bg-pulse: #ffd9d6;
+  --almost-done-bg-pulse: #fce2e6;
+  --incomplete-bg-pulse: #ebeef1;
+  --default-bg-pulse: #eaeef2;
 
   --stop-general-bg: #f7b5bd;
   --stop-target-bg: #6f2dbd;
@@ -83,21 +83,21 @@
 }
 
 [data-joy-color-scheme="dark"], .dark {
-  /* Dark mode colors - GitHub / VS Code dark mode inspired palette */
-  --done-bg: #9c2830; /* Rich crimson/dark red for complete */
-  --almost-done-bg: #742e33; /* Distinct reddish-brown/rose */
-  --todo-bg: #276b2c; /* Rich forest green for todo */
-  --making-bg: #163a70; /* Rich dark blue for making */
-  --incomplete-bg: #3c4350; /* Solid slate gray for incomplete */
+  /* Dark mode colors - GitHub desaturated professional style */
+  --done-bg: #49181b; /* Soft dark red for complete */
+  --almost-done-bg: #37161b; /* Soft dark rose for almost done */
+  --todo-bg: #132f1d; /* Soft dark green for todo */
+  --making-bg: #0d2744; /* Soft dark blue for making */
+  --incomplete-bg: #21262d; /* Soft dark gray for incomplete */
   --dark-accent-border: #30363d; /* GitHub border gray */
-  --row-hover-bg: #1f2937; /* Dark gray for row hover */
+  --row-hover-bg: #1f242c; /* Dark desaturated gray for row hover */
 
-  --todo-bg-pulse: #388e3c;
-  --making-bg-pulse: #21508f;
-  --done-bg-pulse: #b32e3a;
-  --almost-done-bg-pulse: #8f383e;
-  --incomplete-bg-pulse: #4a5363;
-  --default-bg-pulse: #2d3139;
+  --todo-bg-pulse: #1a3f27;
+  --making-bg-pulse: #133860;
+  --done-bg-pulse: #612024;
+  --almost-done-bg-pulse: #4d1f26;
+  --incomplete-bg-pulse: #30363d;
+  --default-bg-pulse: #282e38;
 
   --stop-general-bg: #52292f;
   --stop-target-bg: #3f1e63;

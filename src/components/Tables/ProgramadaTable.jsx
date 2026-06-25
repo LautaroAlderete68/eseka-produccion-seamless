@@ -577,7 +577,7 @@ export default function ProgramadaTable({
           {/* Color + Porcentaje */}
           <td
             className='font-semibold border-x group/color'
-            style={{
+            style={room === 'SEAMLESS' ? {} : {
               backgroundColor: row.Hex,
               color: row.Hex ? (row.WhiteText ? 'white' : 'black') : 'inherit',
             }}
