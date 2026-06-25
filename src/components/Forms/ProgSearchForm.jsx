@@ -205,6 +205,7 @@ export default function ProgSearchForm({
         setFormData={setFormData}
         currentRoomAlertsCount={currentRoomAlertsCount}
         onAcknowledgeAllGroups={acknowledgeAllGroups}
+        live={live}
         btnProps={{
           type: 'reset',
           icon: <FilterAltOffOutlined />,

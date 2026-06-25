@@ -25,6 +25,7 @@ export default function ArtColorTalleInputs({
   inheritedColors,
   currentRoomAlertsCount = 0,
   onAcknowledgeAllGroups,
+  live,
   children,
 }) {
   const { room } = useOutletContext();
@@ -105,7 +106,7 @@ export default function ArtColorTalleInputs({
         </FormControl>
       )}
 
-      {room === 'HOMBRE' && (
+      {live && (
         <FormControl>
           <FormLabel>Estado</FormLabel>
           <Stack

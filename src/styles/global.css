@@ -43,21 +43,21 @@
 }
 
 :root {
-  /* Light mode colors (GitHub desaturated professional style) */
-  --done-bg: #ffebe9; /* Soft desaturated coral/red for complete */
-  --almost-done-bg: #fcf0f2; /* Soft desaturated rose/pink for almost done */
-  --todo-bg: #dafbe1; /* Soft desaturated green for todo */
-  --making-bg: #ddf4ff; /* Soft desaturated blue for making */
-  --incomplete-bg: #f6f8fa; /* Soft desaturated gray for incomplete */
-  --dark-accent-border: #d0d7de; /* GitHub light border gray */
-  --row-hover-bg: #f3f4f6; /* Softer light gray hover */
+  /* Light mode colors (original palette) */
+  --done-bg: #ff8c94; /* Vibrant soft coral/red for complete */
+  --almost-done-bg: #ffb3ba; /* Vibrant soft pink for almost done */
+  --todo-bg: #a1e37b; /* Vibrant soft lime/green for todo */
+  --making-bg: #93c5fd; /* Vibrant soft blue for making */
+  --incomplete-bg: #e2dbdb; /* Vibrant soft warm gray for incomplete */
+  --dark-accent-border: #e2e8f0; /* Softer gray than solid black for light mode */
+  --row-hover-bg: #e2f1fc; /* Softer light blue hover */
 
-  --todo-bg-pulse: #cbf9d7;
-  --making-bg-pulse: #cdeeff;
-  --done-bg-pulse: #ffd9d6;
-  --almost-done-bg-pulse: #fce2e6;
-  --incomplete-bg-pulse: #ebeef1;
-  --default-bg-pulse: #eaeef2;
+  --todo-bg-pulse: #c2f0ab;
+  --making-bg-pulse: #c3e0fc;
+  --done-bg-pulse: #ffb3b9;
+  --almost-done-bg-pulse: #ffdbe0;
+  --incomplete-bg-pulse: #eee9e9;
+  --default-bg-pulse: #e2e8f0;
 
   --stop-general-bg: #f7b5bd;
   --stop-target-bg: #6f2dbd;
@@ -112,10 +112,10 @@
   --joy-palette-neutral-softHoverBg: #374151;
 
   /* Neutral Outlined variants (Outlined buttons like Leyenda, Selects, Inputs) */
-  --joy-palette-neutral-outlinedBg: #111827;
-  --joy-palette-neutral-outlinedBorder: #1f2937;
-  --joy-palette-neutral-outlinedColor: #e5e7eb;
-  --joy-palette-neutral-outlinedHoverBg: #1f2937;
+  --joy-palette-neutral-outlinedBg: #1f2937;
+  --joy-palette-neutral-outlinedBorder: #374151;
+  --joy-palette-neutral-outlinedColor: #f9fafb;
+  --joy-palette-neutral-outlinedHoverBg: #374151;
   --joy-palette-neutral-outlinedHoverBorder: #4b5563;
 
   /* Text colors */
