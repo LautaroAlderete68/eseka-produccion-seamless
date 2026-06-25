@@ -121,7 +121,7 @@ export default function ProgSearchForm({
 
   const currentRoomAlertsCount = useMemo(() => {
     return activeGroupAlerts.filter(alertStyle => 
-      progColor.some(row => matchStyleAlert(alertStyle, row.Articulo))
+      progColor.some(row => matchStyleAlert(alertStyle, row.Articulo) && calcFaltaUnidades(row) > 0)
     ).length;
   }, [activeGroupAlerts, progColor]);
 

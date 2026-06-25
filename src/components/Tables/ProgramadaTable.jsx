@@ -475,7 +475,7 @@ export default function ProgramadaTable({
   function renderRow(row, i, opened, handleClick) {
     const faltaUnidades = calcFaltaUnidades(row);
 
-    const isGroupAlertActive = activeGroupAlerts.some(alertStyle => matchStyleAlert(alertStyle, row.Articulo));
+    const isGroupAlertActive = faltaUnidades > 0 && activeGroupAlerts.some(alertStyle => matchStyleAlert(alertStyle, row.Articulo));
 
     let machinesList;
     if (isGroupAlertActive) {
