@@ -56,7 +56,15 @@ function matchStyleAlert(alertStyle, rowArticulo) {
   if (rowDecimal !== '') {
     const alertSuffix = cleanAlert.match(/\d+$/)?.[0] || '';
     if (alertSuffix === '') return false;
-    return parseInt(rowDecimal, 10) === parseInt(alertSuffix, 10);
+    
+    let parsedRowDec = parseInt(rowDecimal, 10);
+    const parsedAlertSuffix = parseInt(alertSuffix, 10);
+    
+    if (rowDecimal === '1' && parsedAlertSuffix === 10) {
+      parsedRowDec = 10;
+    }
+    
+    return parsedRowDec === parsedAlertSuffix;
   }
 
   return true;
