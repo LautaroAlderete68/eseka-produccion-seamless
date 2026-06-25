@@ -16,7 +16,9 @@ import { useOutletContext } from 'react-router';
 import { ToastsContext } from '../Contexts.js';
 import dayjs from 'dayjs';
 import Switch from '@mui/joy/Switch';
+import Typography from '@mui/joy/Typography';
 import ElectricBoltOutlined from '@mui/icons-material/ElectricBoltOutlined';
+import Warning from '@mui/icons-material/Warning';
 import { playAlertSound } from '../utils/playAlertSound.js';
 import sendTelegramAlert from '../utils/sendTelegramAlert.js';
 
@@ -204,6 +206,28 @@ export default function Maquinas() {
           setFilteredMachines={setFilteredMachines}
         />
       </Stack>
+
+      {room === 'ELECTRONICA' && onlyStopElectronico && displayedMachines.length === 0 && (
+        <Stack
+          direction='row'
+          spacing={1.5}
+          sx={{
+            bgcolor: 'warning.softBg',
+            color: 'warning.softColor',
+            p: 2,
+            mb: 2,
+            borderRadius: 'md',
+            alignItems: 'center',
+            border: '1px solid',
+            borderColor: 'warning.border',
+          }}
+        >
+          <Warning sx={{ color: 'warning.solidBg' }} />
+          <Typography level='title-sm' sx={{ color: 'warning.softColor' }}>
+            No hay ninguna máquina con Stop Electrónico actualmente.
+          </Typography>
+        </Stack>
+      )}
 
       {/* table and map */}
       <TabPanel value={0} className='p-0'>

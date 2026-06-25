@@ -203,110 +203,97 @@ export default function NavBar({ room, setRoom }) {
     };
   }, [apiUrl, location.pathname, room]);
 
-  const navItems = room === 'ELECTRONICA'
-    ? [
+  const navItems = [
+    {
+      title: 'Inicio',
+      items: [
         {
-          title: 'Herramientas',
-          items: [
-            {
-              to: '/maquinas',
-              icon: <ElectricBoltOutlined />,
-              label: 'Electrónica',
-            },
-          ],
+          to: '/',
+          icon: <HomeOutlined />,
+          label: 'Inicio',
         },
-      ]
-    : [
+      ],
+    },
+    {
+      title: 'Programada',
+      items: [
         {
-          title: 'Inicio',
-          items: [
-            {
-              to: '/',
-              icon: <HomeOutlined />,
-              label: 'Inicio',
-            },
-          ],
+          to: '/programada/actual',
+          icon: <TableChartOutlined />,
+          label: 'Actual',
         },
         {
-          title: 'Programada',
-          items: [
-            {
-              to: '/programada/actual',
-              icon: <TableChartOutlined />,
-              label: 'Actual',
-            },
-            {
-              to: '/programada/anteriores',
-              icon: <HistoryOutlined />,
-              label: 'Anteriores',
-            },
-            {
-              to: '/programada/comparar',
-              icon: <CompareArrowsOutlined />,
-              label: 'Comparar',
-            },
-          ],
+          to: '/programada/anteriores',
+          icon: <HistoryOutlined />,
+          label: 'Anteriores',
         },
         {
-          title: 'Herramientas',
-          items: [
-            {
-              to: '/maquinas',
-              icon: <PrecisionManufacturingOutlined />,
-              label: 'Máquinas',
-            },
-            {
-              to: '/cambios',
-              icon: <ChangeCircleOutlined />,
-              label: 'Cambios',
-            },
-            {
-              to: '/produccion',
-              icon: <FactoryOutlined />,
-              label: 'Producción',
-            },
-            {
-              to: '/maquinas',
-              icon: <ElectricBoltOutlined />,
-              label: 'Electrónica',
-              onClick: (e) => {
-                localStorage.setItem('lastTejeduriaRoom', room);
-                setRoom('ELECTRONICA');
-              },
-            },
-          ],
+          to: '/programada/comparar',
+          icon: <CompareArrowsOutlined />,
+          label: 'Comparar',
+        },
+      ],
+    },
+    {
+      title: 'Herramientas',
+      items: [
+        {
+          to: '/maquinas',
+          icon: <PrecisionManufacturingOutlined />,
+          label: 'Máquinas',
         },
         {
-          title: 'Nuevo',
-          items: [
-            {
-              to: '/offline',
-              icon: <SignalWifiOffOutlined />,
-              label: 'Offline',
-            },
-            {
-              to: '/distribucion',
-              icon: <ColorLensOutlined />,
-              label: 'Distribución',
-            },
-            {
-              to: '/produccion-maquinas',
-              icon: <BarChartOutlined />,
-              label: 'Producción y Saldo',
-            },
-            {
-              to: '/disponibles',
-              icon: <InventoryOutlined />,
-              label: 'Disponibles',
-            },
-            {
-              to: '/codigos-color',
-              icon: <QrCodeOutlined />,
-              label: 'Colores',
-            },
-          ],
+          to: '/cambios',
+          icon: <ChangeCircleOutlined />,
+          label: 'Cambios',
         },
-      ];
+        {
+          to: '/produccion',
+          icon: <FactoryOutlined />,
+          label: 'Producción',
+        },
+        {
+          to: '/maquinas',
+          icon: <ElectricBoltOutlined />,
+          label: 'Electrónica',
+          onClick: (e) => {
+            localStorage.setItem('lastTejeduriaRoom', room);
+            setRoom('ELECTRONICA');
+          },
+        },
+      ],
+    },
+    {
+      title: 'Nuevo',
+      items: [
+        {
+          to: '/offline',
+          icon: <SignalWifiOffOutlined />,
+          label: 'Offline',
+        },
+        {
+          to: '/distribucion',
+          icon: <ColorLensOutlined />,
+          label: 'Distribución',
+        },
+        {
+          to: '/produccion-maquinas',
+          icon: <BarChartOutlined />,
+          label: 'Producción y Saldo',
+        },
+        {
+          to: '/disponibles',
+          icon: <InventoryOutlined />,
+          label: 'Disponibles',
+        },
+        {
+          to: '/codigos-color',
+          icon: <QrCodeOutlined />,
+          label: 'Colores',
+        },
+      ],
+    },
+  ];
 
 
   const { mode, setMode } = useColorScheme();
@@ -438,6 +425,9 @@ export default function NavBar({ room, setRoom }) {
                     onClick={(e) => {
                       if (item.onClick) {
                         item.onClick(e);
+                      } else if (room === 'ELECTRONICA') {
+                        const lastRoom = localStorage.getItem('lastTejeduriaRoom') || 'HOMBRE';
+                        setRoom(lastRoom);
                       }
                     }}
                   >
