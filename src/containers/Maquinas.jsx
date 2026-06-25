@@ -12,7 +12,7 @@ import Tabs from '@mui/joy/Tabs';
 import MapOutlined from '@mui/icons-material/MapOutlined';
 import TableChartOutlined from '@mui/icons-material/TableChartOutlined';
 import MaquinasMap from '../components/MaquinasMap.jsx';
-import { useOutletContext } from 'react-router';
+import { useOutletContext, useLocation } from 'react-router';
 import { ToastsContext } from '../Contexts.js';
 import dayjs from 'dayjs';
 import Switch from '@mui/joy/Switch';
@@ -28,6 +28,8 @@ export default function Maquinas() {
   apiUrl = useConfig().apiUrl;
   const { addToast, removeToast } = useContext(ToastsContext);
   const { room } = useOutletContext();
+  const location = useLocation();
+  const isElectronica = location.pathname === '/electronica';
   const [machines, setMachines] = useState([]);
   const [filteredMachines, setFilteredMachines] = useState([]);
   const [defaultTab, setDefaultTab] = useState(
@@ -36,17 +38,15 @@ export default function Maquinas() {
   const [onlyStopElectronico, setOnlyStopElectronico] = useState(false);
 
   const getMachines = () => {
-    fetch(`${apiUrl}/${room}/machines`)
+    const fetchRoom = isElectronica ? 'ELECTRONICA' : room;
+    fetch(`${apiUrl}/${fetchRoom}/machines`)
       .then((res) => res.json())
       .then((data) => {
         let machs = [...data];
-
-        // No room filtering for ELECTRONICA anymore. All rooms are always fetched.
-
         setMachines(machs);
       })
       .catch((err) =>
-        console.error(`[CLIENT] Error fetching /${room}/machines:`, err)
+        console.error(`[CLIENT] Error fetching /${fetchRoom}/machines:`, err)
       );
   };
 
@@ -63,14 +63,14 @@ export default function Maquinas() {
       ignore = true;
       clearInterval(intervalId);
     };
-  }, [room]);
+  }, [room, isElectronica]);
 
   const displayedMachines = useMemo(() => {
-    if (room === 'ELECTRONICA' && onlyStopElectronico) {
+    if (isElectronica && onlyStopElectronico) {
       return machines.filter((m) => m.State === 6);
     }
     return machines;
-  }, [machines, room, onlyStopElectronico]);
+  }, [machines, isElectronica, onlyStopElectronico]);
 
   const sortedMachines = useMemo(
     () => [...displayedMachines].sort((a, b) => a.MachCode - b.MachCode),
@@ -96,7 +96,7 @@ export default function Maquinas() {
 
   // when there is a mach with electronico stop, send toast
   useEffect(() => {
-    if (room !== 'ELECTRONICA') return;
+    if (!isElectronica) return;
 
     let ignore = false;
 
@@ -136,7 +136,7 @@ export default function Maquinas() {
     return () => {
       ignore = true;
     };
-  }, [room, electronicoIds]);
+  }, [isElectronica, electronicoIds]);
 
   return (
     <Tabs
@@ -183,7 +183,7 @@ export default function Maquinas() {
           </Tab>
         </TabList>
 
-        {room === 'ELECTRONICA' && (
+        {isElectronica && (
           <Switch
             checked={onlyStopElectronico}
             onChange={(e) => setOnlyStopElectronico(e.target.checked)}
@@ -207,7 +207,7 @@ export default function Maquinas() {
         />
       </Stack>
 
-      {room === 'ELECTRONICA' && onlyStopElectronico && displayedMachines.length === 0 && (
+      {isElectronica && onlyStopElectronico && displayedMachines.length === 0 && (
         <Stack
           direction='row'
           spacing={1.5}

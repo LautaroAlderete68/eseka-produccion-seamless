@@ -253,13 +253,9 @@ export default function NavBar({ room, setRoom }) {
           label: 'Producción',
         },
         {
-          to: '/maquinas',
+          to: '/electronica',
           icon: <ElectricBoltOutlined />,
           label: 'Electrónica',
-          onClick: (e) => {
-            localStorage.setItem('lastTejeduriaRoom', room);
-            setRoom('ELECTRONICA');
-          },
         },
       ],
     },
@@ -425,19 +421,12 @@ export default function NavBar({ room, setRoom }) {
                     onClick={(e) => {
                       if (item.onClick) {
                         item.onClick(e);
-                      } else if (room === 'ELECTRONICA') {
-                        const lastRoom = localStorage.getItem('lastTejeduriaRoom') || 'HOMBRE';
-                        setRoom(lastRoom);
                       }
                     }}
                   >
                     {({ isActive }) => {
                       let animationClass = '';
-                      const isItemActive = isActive && (
-                        item.label === 'Electrónica'
-                          ? room === 'ELECTRONICA'
-                          : room !== 'ELECTRONICA'
-                      );
+                      const isItemActive = isActive;
 
                       if (!isItemActive) {
                         if (item.to === '/offline' && hasOfflineAlerts) {

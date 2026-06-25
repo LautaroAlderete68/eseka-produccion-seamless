@@ -134,6 +134,7 @@ export default function App() {
             <Route path='comparar' element={<ProgComparar />} />
           </Route>
           <Route path='maquinas' element={<Maquinas />} />
+          <Route path='electronica' element={<Maquinas />} />
           <Route path='cambios' element={<Cambios />} />
           <Route path='produccion' element={<Produccion />} />
           <Route path='offline' element={<Offline />} />
