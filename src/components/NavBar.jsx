@@ -143,7 +143,7 @@ export default function NavBar({ room, setRoom }) {
             const cantidadAnterior = trackedGroupsLength[style] || 0;
 
             let isRelevant = false;
-            if (group.allTargetsZero) {
+            if (group.allTargetsZero || group.targetMet) {
               isRelevant = false;
             } else if (cantidad > 1) {
               isRelevant = true;
